@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:hourlyWorkTracker"
         mc:Ignorable="d"
-        Title="Hourly Wage Ticker" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True" Height="450" Width="800">
+        Title="Hourly Wage Ticker" WindowStyle="None" ResizeMode="CanResize" AllowsTransparency="True" Height="450" Width="800">
     <Window.Resources>
         <RadialGradientBrush x:Key="backgroundBrush" Center="0.35, 0.6" RadiusX="0.5" RadiusY="0.5">
             <GradientStop Color="#707070" Offset="0.05"/>
@@ -14,9 +14,63 @@
             <GradientStop Color="Black" Offset="1"/>
         </RadialGradientBrush>
         <SolidColorBrush x:Key="moneyColor" Color="#118C4F"/>
+        <Style x:Key="GripArea" TargetType="Rectangle">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Fill" Value="#118C4F" />
+            <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+            <EventSetter Event="MouseLeftButtonDown" Handler="resizeWindowBegin" />
+            <EventSetter Event="MouseLeftButtonUp" Handler="resizeWindowEnd" />
+            <EventSetter Event="MouseMove" Handler="resizeWindow" />
+        </Style>
     </Window.Resources>
-    <Border Name="mainWindowBorder" BorderBrush="{StaticResource moneyColor}" BorderThickness="3">
-        <Canvas Name="mainWindowCanvas" Background="{StaticResource backgroundBrush}">
-        </Canvas>
-    </Border>
+    <Grid Name="mainWindowCanvas" Background="{StaticResource backgroundBrush}">
+        <Rectangle x:Name="leftGrip"
+                        Width="7"
+                        HorizontalAlignment="Left"
+                        Cursor="SizeWE"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle x:Name="rightGrip"
+                        Width="7"
+                        HorizontalAlignment="Right"
+                        Cursor="SizeWE"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle x:Name="topGrip"
+                        Height="7"
+                        VerticalAlignment="Top"
+                        Cursor="SizeNS"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle x:Name="bottomGrip"
+                        Height="7"
+                        VerticalAlignment="Bottom"
+                        Cursor="SizeNS"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle Name="topLeftGrip"
+                        Width="7"
+                        Height="7"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Cursor="SizeNWSE"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle Name="bottomRightGrip"
+                        Width="7"
+                        Height="7"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Cursor="SizeNWSE"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle x:Name="topRightGrip"
+                        Width="7"
+                        Height="7"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Cursor="SizeNESW"
+                        Style="{StaticResource GripArea}" />
+        <Rectangle x:Name="bottomLeftGrip"
+                        Width="7"
+                        Height="7"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Cursor="SizeNESW"
+                        Style="{StaticResource GripArea}" />
+    </Grid>
 </Window>
