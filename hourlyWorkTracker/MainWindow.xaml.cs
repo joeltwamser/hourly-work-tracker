@@ -56,6 +56,8 @@ namespace hourlyWorkTracker
                     Window? main_window = sender_rectangle.Tag as Window;
                     double width = e.GetPosition(main_window).X;
                     double height = e.GetPosition(main_window).Y;
+                    double temp_width = 0.0;
+                    double temp_height = 0.0;
                     sender_rectangle.CaptureMouse();
                     if (sender_rectangle.Name.ToLower().Contains("right"))
                     {
@@ -66,12 +68,14 @@ namespace hourlyWorkTracker
                     if (sender_rectangle.Name.ToLower().Contains("left"))
                     {
                         width -= 5;
-                        main_window.Left += width;
+                        temp_width = width;
                         width = main_window.Width - width;
                         if (width > 0)
                         {
                             main_window.Width = width;
+                            main_window.Left += temp_width;
                         }
+                        temp_width = 0.0;
                     }
                     if (sender_rectangle.Name.ToLower().Contains("bottom"))
                     {
@@ -82,12 +86,14 @@ namespace hourlyWorkTracker
                     if (sender_rectangle.Name.ToLower().Contains("top"))
                     {
                         height -= 5;
-                        main_window.Top += height;
+                        temp_height = height;
                         height = main_window.Height - height;
                         if (height > 0)
                         {
                             main_window.Height = height;
+                            main_window.Top += temp_height;
                         }
+                        temp_height = 0.0;
                     }
                 }
             }
