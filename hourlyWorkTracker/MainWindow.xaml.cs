@@ -20,14 +20,17 @@ namespace hourlyWorkTracker
     /// </summary>
     public partial class MainWindow : Window
     {
+        //fields
+        bool resize_window_in_process = false;
+        bool drag_window_in_process = false;
         public MainWindow()
         {
             InitializeComponent();
         }
-
-        bool resize_window_in_process = false;
         private void resizeWindowBegin(object sender, MouseButtonEventArgs e)
         {
+            if (drag_window_in_process)
+                return;
             Rectangle? sender_rectangle = sender as Rectangle;
             if (sender_rectangle != null)
             {
@@ -38,6 +41,8 @@ namespace hourlyWorkTracker
 
         private void resizeWindowEnd(object sender, MouseButtonEventArgs e)
         {
+            if (drag_window_in_process)
+                return;
             Rectangle? sender_rectangle = sender as Rectangle;
             if (sender_rectangle != null)
             {
@@ -97,6 +102,19 @@ namespace hourlyWorkTracker
                     }
                 }
             }
+        }
+
+        private void leftClickDragWindow(object sender, MouseButtonEventArgs e)
+        {
+            if (resize_window_in_process)
+                return;
+            else
+                drag_window_in_process = true;
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                this.DragMove();
+            }
+            drag_window_in_process = false;
         }
     }
 }
