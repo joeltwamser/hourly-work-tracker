@@ -105,7 +105,7 @@ namespace hourlyWorkTracker
             }
         }
 
-        private void leftClickDragWindow(object sender, MouseButtonEventArgs e)
+        private void clickedWindow(object sender, MouseButtonEventArgs e)
         {
             if (resize_window_in_process)
                 return;
@@ -113,6 +113,15 @@ namespace hourlyWorkTracker
             {
                 this.DragMove();
             }
+            /*else if(e.ChangedButton == MouseButton.Right)
+            {
+
+            }*/
+        }
+
+        private void closeApplication(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }
