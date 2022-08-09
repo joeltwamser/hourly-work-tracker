@@ -22,15 +22,15 @@ namespace hourlyWorkTracker
     {
         //fields
         bool resize_window_in_process = false;
-        bool drag_window_in_process = false;
         public MainWindow()
         {
             InitializeComponent();
         }
         private void resizeWindowBegin(object sender, MouseButtonEventArgs e)
         {
-            if (drag_window_in_process)
+            if (e.ChangedButton != MouseButton.Left)
                 return;
+            e.Handled = true;
             Rectangle? sender_rectangle = sender as Rectangle;
             if (sender_rectangle != null)
             {
@@ -41,8 +41,9 @@ namespace hourlyWorkTracker
 
         private void resizeWindowEnd(object sender, MouseButtonEventArgs e)
         {
-            if (drag_window_in_process)
+            if (e.ChangedButton != MouseButton.Left)
                 return;
+            e.Handled = true;
             Rectangle? sender_rectangle = sender as Rectangle;
             if (sender_rectangle != null)
             {
@@ -59,10 +60,12 @@ namespace hourlyWorkTracker
                 if(sender_rectangle != null)
                 {
                     Window? main_window = sender_rectangle.Tag as Window;
+                    if (main_window == null)
+                        return;
                     double width = e.GetPosition(main_window).X;
                     double height = e.GetPosition(main_window).Y;
-                    double temp_width = 0.0;
-                    double temp_height = 0.0;
+                    double temp_width;
+                    double temp_height;
                     sender_rectangle.CaptureMouse();
                     if (sender_rectangle.Name.ToLower().Contains("right"))
                     {
@@ -80,7 +83,6 @@ namespace hourlyWorkTracker
                             main_window.Width = width;
                             main_window.Left += temp_width;
                         }
-                        temp_width = 0.0;
                     }
                     if (sender_rectangle.Name.ToLower().Contains("bottom"))
                     {
@@ -98,7 +100,6 @@ namespace hourlyWorkTracker
                             main_window.Height = height;
                             main_window.Top += temp_height;
                         }
-                        temp_height = 0.0;
                     }
                 }
             }
@@ -108,13 +109,10 @@ namespace hourlyWorkTracker
         {
             if (resize_window_in_process)
                 return;
-            else
-                drag_window_in_process = true;
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
             }
-            drag_window_in_process = false;
         }
     }
 }

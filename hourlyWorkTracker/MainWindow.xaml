@@ -18,8 +18,8 @@
             <Setter Property="Focusable" Value="False" />
             <Setter Property="Fill" Value="#118C4F" />
             <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
-            <EventSetter Event="MouseLeftButtonDown" Handler="resizeWindowBegin" />
-            <EventSetter Event="MouseLeftButtonUp" Handler="resizeWindowEnd" />
+            <EventSetter Event="MouseDown" Handler="resizeWindowBegin" />
+            <EventSetter Event="MouseUp" Handler="resizeWindowEnd" />
             <EventSetter Event="MouseMove" Handler="resizeWindow" />
         </Style>
     </Window.Resources>
