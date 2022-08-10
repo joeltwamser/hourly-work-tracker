@@ -113,15 +113,17 @@ namespace hourlyWorkTracker
             {
                 this.DragMove();
             }
-            /*else if(e.ChangedButton == MouseButton.Right)
-            {
-
-            }*/
         }
 
         private void closeApplication(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void openConfigureWindow(object sender, RoutedEventArgs e)
+        {
+            ConfigureWindow my_configure_window = new ConfigureWindow();
+            my_configure_window.Show();
         }
     }
 }

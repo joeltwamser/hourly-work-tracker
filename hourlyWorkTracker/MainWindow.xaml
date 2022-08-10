@@ -25,7 +25,7 @@
     </Window.Resources>
     <Window.ContextMenu>
         <ContextMenu Name="RightClickMenu" StaysOpen="True">
-            <MenuItem Header="Configure"/>
+            <MenuItem Header="Configure" Click="openConfigureWindow"/>
             <MenuItem Header="Close" Click="closeApplication"/>
         </ContextMenu>
     </Window.ContextMenu>
