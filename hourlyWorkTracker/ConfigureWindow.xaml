@@ -5,8 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:hourlyWorkTracker"
         mc:Ignorable="d"
-        Title="ConfigureWindow" Height="500" Width="500">
-    <Grid>
-        <Button Name="CloseWindowButton" Click="closeConfigureWindow">Close</Button>
-    </Grid>
+        Title="ConfigureWindow" Height="500" Width="500" MinWidth="250">
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <Button Name="CloseWindowButton" Margin="4" Height="30" Width="250" HorizontalAlignment="Right" Click="closeConfigureWindow">Close</Button>
+        </DockPanel>
+        <TabControl Name="DynamicTabControl" DockPanel.Dock="Top">
+            <TabItem Header="UI Layout">
+                <Label Content="Various UI Options Go Here..." />
+            </TabItem>
+            <TabItem Header="Opacity">
+                <Slider Name="OpacitySlider" Margin="10" Minimum="0" Maximum="100" Value="100" ValueChanged="updateMainWindowOpacity"/>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>
