@@ -9,12 +9,26 @@
         <DockPanel DockPanel.Dock="Bottom">
             <Button Name="CloseWindowButton" Margin="4" Height="30" Width="250" HorizontalAlignment="Right" Click="closeConfigureWindow">Close</Button>
         </DockPanel>
-        <TabControl Name="DynamicTabControl" DockPanel.Dock="Top">
+        <TabControl Name="DynamicTabControl" DockPanel.Dock="Top" SelectionChanged="tabControlSelectionChanged">
+            <TabItem Header="Wage Info">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="16" Margin="7,3,0,0"><Bold>Update Hourly Wage:</Bold></TextBlock>
+                    <TextBlock FontSize="12" Margin="12,0,0,0">(Format ex: ##.##)</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="4,5,4,4">
+                        <TextBox Name="HourlyWageTextBox" Width="200" MaxLength="100" Background="LightGray"></TextBox>
+                        <Button Width="80" Margin="10,0,0,0" Click="saveHourlyWage">Save</Button>
+                        <TextBlock Name="SavedTextBlock" Margin="15,1,0,0" Foreground="Green" Visibility="Hidden"><Bold><Italic>SAVED!!!</Italic></Bold></TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
             <TabItem Header="UI Layout">
                 <Label Content="Various UI Options Go Here..." />
             </TabItem>
             <TabItem Header="Opacity">
-                <Slider Name="OpacitySlider" Margin="10" Minimum="10" Maximum="100" ValueChanged="updateMainWindowOpacity"/>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="16" Margin="7,3,0,0"><Bold>Opacity:</Bold></TextBlock>
+                    <Slider Name="OpacitySlider" Margin="10" Minimum="10" Maximum="100" ValueChanged="updateMainWindowOpacity"/>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </DockPanel>

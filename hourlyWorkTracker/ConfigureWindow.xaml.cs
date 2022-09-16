@@ -55,6 +55,31 @@ namespace hourlyWorkTracker
             ApplicationSettingsStatic.OpacitySliderValue = opacity_slider.Value;
         }
 
+        private void saveHourlyWage(object sender, RoutedEventArgs e)
+        {
+            string temp = HourlyWageTextBox.Text.Replace(",", string.Empty);
+            double hourly_wage = 0.0;
+            bool success = double.TryParse(temp, out hourly_wage);
+            if(success)
+            {
+                ApplicationSettingsStatic.HourlyWage = hourly_wage;
+                HourlyWageTextBox.Clear();
+                SavedTextBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MessageBox.Show("Incorrect format");
+            }
+        }
+
+        private void tabControlSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl)
+            {
+                SavedTextBlock.Visibility = Visibility.Hidden;
+            }
+        }
+
         /*private void onWindowSizeChanged(object sender, SizeChangedEventArgs e)
         {
             DockPanel? cw_dock_panel = sender as DockPanel;

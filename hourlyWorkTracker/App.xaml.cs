@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.IO;
 using System.Collections;
+using System.Threading;
 
 namespace hourlyWorkTracker
 {
@@ -17,8 +18,19 @@ namespace hourlyWorkTracker
     {
         private const string filename = "Settings.conf";
 
+        public Mutex? One_session
+        { get; set; }
+
         private void App_Startup(object sender, StartupEventArgs e)
         {
+            bool isNewInstance = false;
+            One_session = new Mutex(true, "hourlyWorkTrackerApplication", out isNewInstance);
+            if (!isNewInstance)
+            {
+                //An instance of the app is already running
+                MessageBox.Show("Already running application...");
+                App.Current.Shutdown();
+            }
             try
             {
                 using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
@@ -35,6 +47,7 @@ namespace hourlyWorkTracker
                     }
                     ApplicationSettingsStatic.OpacitySliderValue = Convert.ToDouble(allValues[0]);
                     ApplicationSettingsStatic.MainWindowOpacity = Convert.ToDouble(allValues[1]);
+                    ApplicationSettingsStatic.HourlyWage = Convert.ToDouble(allValues[2]);
                     sr.Close();
                     fs.Close();
                 }
@@ -43,6 +56,7 @@ namespace hourlyWorkTracker
             {
                 ApplicationSettingsStatic.OpacitySliderValue = 100.0;
                 ApplicationSettingsStatic.MainWindowOpacity = 1.0;
+                ApplicationSettingsStatic.HourlyWage = 0.0;
             }
         }
 
@@ -52,7 +66,8 @@ namespace hourlyWorkTracker
             using (StreamWriter sw = new StreamWriter(fs))
             {
                 sw.Write(ApplicationSettingsStatic.OpacitySliderValue + ",");
-                sw.Write(ApplicationSettingsStatic.MainWindowOpacity);
+                sw.Write(ApplicationSettingsStatic.MainWindowOpacity + ",");
+                sw.Write(ApplicationSettingsStatic.HourlyWage);
                 sw.Close();
                 fs.Close();
             }

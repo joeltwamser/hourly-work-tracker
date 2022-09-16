@@ -13,5 +13,8 @@ namespace hourlyWorkTracker
 
         public static double MainWindowOpacity
         { get; set; }
+
+        public static double HourlyWage
+        { get; set; }
     }
 }
