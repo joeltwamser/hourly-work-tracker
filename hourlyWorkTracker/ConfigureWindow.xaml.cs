@@ -23,9 +23,12 @@ namespace hourlyWorkTracker
     //so I can modify the opacity using the value of the slider.  How else am I supposed to do it?
     public partial class ConfigureWindow : Window
     {
+        private bool _entered_once = false;
+
         public ConfigureWindow()
         {
             InitializeComponent();
+            OpacitySlider.Value = ApplicationSettingsStatic.OpacitySliderValue;
         }
 
         private void closeConfigureWindow(object sender, RoutedEventArgs e)
@@ -35,15 +38,21 @@ namespace hourlyWorkTracker
 
         private void updateMainWindowOpacity(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (!_entered_once)
+            {
+                _entered_once = true;
+                return;
+            }
             Slider? opacity_slider = sender as Slider;
             if (opacity_slider == null)
             {
                 return;
             }
-            //is this bad practice? idk WPF very well.
+            //is this bad practice? to just get the main window of the application? idk WPF very well.
             Window? main_window = Application.Current.MainWindow;
-            //confirmed opacity_slider.Value is in fact changing as I slide the slider.
-            main_window.Opacity = (opacity_slider.Value)/100.0;
+            main_window.Opacity = opacity_slider.Value / 100.0;
+            ApplicationSettingsStatic.MainWindowOpacity = main_window.Opacity;
+            ApplicationSettingsStatic.OpacitySliderValue = opacity_slider.Value;
         }
 
         /*private void onWindowSizeChanged(object sender, SizeChangedEventArgs e)

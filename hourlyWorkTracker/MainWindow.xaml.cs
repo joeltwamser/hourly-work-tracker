@@ -21,10 +21,11 @@ namespace hourlyWorkTracker
     public partial class MainWindow : Window
     {
         //fields
-        bool resize_window_in_process = false;
+        private bool resize_window_in_process;
         public MainWindow()
         {
             InitializeComponent();
+            Opacity = ApplicationSettingsStatic.MainWindowOpacity;
         }
         private void resizeWindowBegin(object sender, MouseButtonEventArgs e)
         {
@@ -123,7 +124,7 @@ namespace hourlyWorkTracker
         private void openConfigureWindow(object sender, RoutedEventArgs e)
         {
             ConfigureWindow my_configure_window = new ConfigureWindow();
-            my_configure_window.Show();
+            my_configure_window.ShowDialog();
         }
     }
 }
