@@ -16,5 +16,8 @@ namespace hourlyWorkTracker
 
         public static double HourlyWage
         { get; set; }
+
+        public static double TotalMoney
+        { get; set; }
     }
 }

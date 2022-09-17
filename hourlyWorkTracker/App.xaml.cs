@@ -48,6 +48,7 @@ namespace hourlyWorkTracker
                     ApplicationSettingsStatic.OpacitySliderValue = Convert.ToDouble(allValues[0]);
                     ApplicationSettingsStatic.MainWindowOpacity = Convert.ToDouble(allValues[1]);
                     ApplicationSettingsStatic.HourlyWage = Convert.ToDouble(allValues[2]);
+                    ApplicationSettingsStatic.TotalMoney = Convert.ToDouble(allValues[3]);
                     sr.Close();
                     fs.Close();
                 }
@@ -57,6 +58,7 @@ namespace hourlyWorkTracker
                 ApplicationSettingsStatic.OpacitySliderValue = 100.0;
                 ApplicationSettingsStatic.MainWindowOpacity = 1.0;
                 ApplicationSettingsStatic.HourlyWage = 0.0;
+                ApplicationSettingsStatic.TotalMoney = 0.0;
             }
         }
 
@@ -67,7 +69,8 @@ namespace hourlyWorkTracker
             {
                 sw.Write(ApplicationSettingsStatic.OpacitySliderValue + ",");
                 sw.Write(ApplicationSettingsStatic.MainWindowOpacity + ",");
-                sw.Write(ApplicationSettingsStatic.HourlyWage);
+                sw.Write(ApplicationSettingsStatic.HourlyWage + ",");
+                sw.Write(ApplicationSettingsStatic.TotalMoney);
                 sw.Close();
                 fs.Close();
             }

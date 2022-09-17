@@ -55,16 +55,35 @@ namespace hourlyWorkTracker
             ApplicationSettingsStatic.OpacitySliderValue = opacity_slider.Value;
         }
 
-        private void saveHourlyWage(object sender, RoutedEventArgs e)
+        private void saveButton(object sender, RoutedEventArgs e)
         {
-            string temp = HourlyWageTextBox.Text.Replace(",", string.Empty);
+            Button? save_button = sender as Button;
+            if (save_button == null) { return; }
+            string temp;
             double hourly_wage = 0.0;
-            bool success = double.TryParse(temp, out hourly_wage);
-            if(success)
+            double total_money = 0.0;
+            bool successfullyParsedInput = false;
+            if (save_button.Name == "SaveHourlyWageButton")
+            {
+                temp = HourlyWageTextBox.Text.Replace(",", string.Empty);
+                successfullyParsedInput = double.TryParse(temp, out hourly_wage);
+            }
+            else if (save_button.Name == "SaveTotalMoneyButton")
+            {
+                temp = TotalMoneyTextBox.Text.Replace(",", string.Empty);
+                successfullyParsedInput = double.TryParse(temp, out total_money);
+            }
+            if (successfullyParsedInput && save_button.Name == "SaveHourlyWageButton")
             {
                 ApplicationSettingsStatic.HourlyWage = hourly_wage;
                 HourlyWageTextBox.Clear();
                 SavedTextBlock.Visibility = Visibility.Visible;
+            }
+            else if (successfullyParsedInput && save_button.Name == "SaveTotalMoneyButton")
+            {
+                ApplicationSettingsStatic.TotalMoney = total_money;
+                TotalMoneyTextBox.Clear();
+                anotherSavedTextBlock.Visibility = Visibility.Visible;
             }
             else
             {
@@ -77,6 +96,7 @@ namespace hourlyWorkTracker
             if (e.Source is TabControl)
             {
                 SavedTextBlock.Visibility = Visibility.Hidden;
+                anotherSavedTextBlock.Visibility = Visibility.Hidden;
             }
         }
 

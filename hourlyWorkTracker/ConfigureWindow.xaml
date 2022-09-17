@@ -5,6 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:hourlyWorkTracker"
         mc:Ignorable="d" Title="ConfigureWindow" Height="500" Width="500" MinWidth="250">
+    <Window.Resources>
+        <Style x:Key="TextBlockHeadingSettings" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="7,3,0,0"/>
+        </Style>
+        <Style x:Key="TextBlockSubHeadingSettings" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="12,0,0,0"/>
+        </Style>
+        <Style x:Key="TextBoxSettings" TargetType="TextBox">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="MaxLength" Value="100"/>
+            <Setter Property="Background" Value="LightGray"/>
+        </Style>
+        <Style x:Key="SaveButtonSettings" TargetType="Button">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+        </Style>
+        <Style x:Key="SavedTextBlock" TargetType="TextBlock">
+            <Setter Property="Margin" Value="15,1,0,0"/>
+            <Setter Property="Foreground" Value="Green"/>
+            <Setter Property="Visibility" Value="Hidden"/>
+        </Style>
+    </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Bottom">
             <Button Name="CloseWindowButton" Margin="4" Height="30" Width="250" HorizontalAlignment="Right" Click="closeConfigureWindow">Close</Button>
@@ -12,12 +36,19 @@
         <TabControl Name="DynamicTabControl" DockPanel.Dock="Top" SelectionChanged="tabControlSelectionChanged">
             <TabItem Header="Wage Info">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock FontSize="16" Margin="7,3,0,0"><Bold>Update Hourly Wage:</Bold></TextBlock>
-                    <TextBlock FontSize="12" Margin="12,0,0,0">(Format ex: ##.##)</TextBlock>
+                    <TextBlock Style="{StaticResource TextBlockHeadingSettings}"><Bold>Update Hourly Wage:</Bold></TextBlock>
+                    <TextBlock Style="{StaticResource TextBlockSubHeadingSettings}">(Format ex: ##.##)</TextBlock>
                     <StackPanel Orientation="Horizontal" Margin="4,5,4,4">
-                        <TextBox Name="HourlyWageTextBox" Width="200" MaxLength="100" Background="LightGray"></TextBox>
-                        <Button Width="80" Margin="10,0,0,0" Click="saveHourlyWage">Save</Button>
-                        <TextBlock Name="SavedTextBlock" Margin="15,1,0,0" Foreground="Green" Visibility="Hidden"><Bold><Italic>SAVED!!!</Italic></Bold></TextBlock>
+                        <TextBox Name="HourlyWageTextBox" Style="{StaticResource TextBoxSettings}"></TextBox>
+                        <Button Name="SaveHourlyWageButton" Click="saveButton" Style="{StaticResource SaveButtonSettings}">Save</Button>
+                        <TextBlock Name="SavedTextBlock" Style="{StaticResource SavedTextBlock}"><Bold><Italic>SAVED!!!</Italic></Bold></TextBlock>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource TextBlockHeadingSettings}"><Bold>Update Total Money Made:</Bold></TextBlock>
+                    <TextBlock Style="{StaticResource TextBlockSubHeadingSettings}">(Format ex: ###,###,###.##)</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="4,5,4,4">
+                        <TextBox Name="TotalMoneyTextBox" Style="{StaticResource TextBoxSettings}"></TextBox>
+                        <Button Name="SaveTotalMoneyButton" Click="saveButton" Style="{StaticResource SaveButtonSettings}">Save</Button>
+                        <TextBlock Name="anotherSavedTextBlock" Style="{StaticResource SavedTextBlock}"><Bold><Italic>SAVED!!!</Italic></Bold></TextBlock>
                     </StackPanel>
                 </StackPanel>
             </TabItem>
