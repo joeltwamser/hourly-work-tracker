@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:hourlyWorkTracker"
         mc:Ignorable="d"
         Title="Hourly Wage Ticker" WindowStyle="None" ResizeMode="CanResize" AllowsTransparency="True"
-        MouseDown="clickedWindow" Height="450" Width="800" Closed="onClosed">
+        MouseDown="clickedWindow" Height="450" Width="800" Closing="onClosing">
     <Window.Resources>
         <RadialGradientBrush x:Key="backgroundBrush" Center="0.35, 0.6" RadiusX="0.5" RadiusY="0.5">
             <GradientStop Color="#707070" Offset="0.05"/>

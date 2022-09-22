@@ -193,8 +193,12 @@ namespace hourlyWorkTracker
             }
         }
 
-        private void onClosed(object sender, EventArgs e)
+        private void onClosing(object sender, EventArgs e)
         {
+            if (_running)
+            {
+                onStartStopSessionClick(StartStopSessionButton, new RoutedEventArgs());
+            }
             saveTotalMoney();
         }
 
