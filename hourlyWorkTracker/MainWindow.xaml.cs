@@ -29,13 +29,18 @@ namespace hourlyWorkTracker
         private System.Timers.Timer _timer;
         private Stopwatch _stopwatch;
         private bool _running = false;
+
+
         public MainWindow()
         {
             InitializeComponent();
             Opacity = ApplicationSettingsStatic.MainWindowOpacity;
             ApplicationSettingsStatic.TotalMoneyChanged += onTotalMoneyChanged;
             CurrentMoneyDisplay.Text = _starting_money;
+            CurrentMoneyDisplay.FontWeight = FontWeights.Bold;
             TotalMoneyDisplay.Text = "$" + ApplicationSettingsStatic.TotalMoney.ToString("F2");
+            TotalMoneyDisplay.FontWeight = FontWeights.Bold;
+            
 
             _stopwatch = new Stopwatch();
             _timer = new System.Timers.Timer(10);
@@ -126,12 +131,21 @@ namespace hourlyWorkTracker
                     double height = e.GetPosition(main_window).Y;
                     double temp_width;
                     double temp_height;
+                    double calculated_height = 0.0;
+                    bool entered_right_or_left = false;
+                    bool entered_top_or_bottom = false;
+                    double ratio = 16.0 / 9.0;
                     sender_rectangle.CaptureMouse();
+
                     if (sender_rectangle.Name.ToLower().Contains("right"))
                     {
                         width += 5;
                         if (width > 0)
+                        {
                             main_window.Width = width;
+                            calculated_height = width / ratio;
+                        }
+                        entered_right_or_left = true;
                     }
                     if (sender_rectangle.Name.ToLower().Contains("left"))
                     {
@@ -142,25 +156,69 @@ namespace hourlyWorkTracker
                         {
                             main_window.Width = width;
                             main_window.Left += temp_width;
+                            calculated_height = width / ratio;
                         }
+                        entered_right_or_left = true;
                     }
                     if (sender_rectangle.Name.ToLower().Contains("bottom"))
                     {
                         height += 5;
-                        if (height > 0)
+                        if (height > 0 && !entered_right_or_left)
+                        {
                             main_window.Height = height;
+                            main_window.Width = height * ratio;
+                        }
+                        else if (height > 0 && entered_right_or_left)
+                            main_window.Height = calculated_height;
+                        entered_top_or_bottom = true;
                     }
                     if (sender_rectangle.Name.ToLower().Contains("top"))
                     {
                         height -= 5;
-                        temp_height = height;
-                        height = main_window.Height - height;
-                        if (height > 0)
+                        if (entered_right_or_left && calculated_height > 0)
                         {
-                            main_window.Height = height;
-                            main_window.Top += temp_height;
+                            temp_height = main_window.Height;
+                            main_window.Height = calculated_height;
+                            main_window.Top += (temp_height - calculated_height);
                         }
+                        else if (!entered_right_or_left)
+                        {
+                            temp_height = height;
+                            height = main_window.Height - height;
+                            if (height > 0)
+                            {
+                                main_window.Height = height;
+                                main_window.Top += temp_height;
+                                main_window.Width = height * ratio;
+                            }
+                        }
+                        entered_top_or_bottom = true;
                     }
+                    if (entered_right_or_left && !entered_top_or_bottom)
+                    {
+                        main_window.Height = calculated_height;
+                    }
+                    ContainerCanvas.Height = main_window.Height;
+                    ContainerCanvas.Width = main_window.Width;
+                    MainWindowGrid.Height = ContainerCanvas.Height;
+                    MainWindowGrid.Width = ContainerCanvas.Width;
+
+                    //There's GOT to be a better way than this to dynamically
+                    //resize elements based on the size of a parent element.
+                    //I'm for sure doing this wrong.
+                    //I already know I could replace these numbers with variables,
+                    //eliminate most of the definitions from the UI, and programmatically
+                    //define these in the constructor probably.  That'd probably be at least
+                    //better since I'm already doing it this way.
+                    CurrentMoneyDisplay.FontSize = main_window.Width / 8;
+                    TotalMoneyDisplay.FontSize = (main_window.Width / 8) * 0.6;
+                    StartStopSessionButton.FontSize = main_window.Width / 30.77;
+                    ResetSessionButton.FontSize = main_window.Width / 30.77;
+                    StartStopSessionButton.Height = main_window.Width / 11.43;
+                    ResetSessionButton.Height = main_window.Width / 11.43;
+                    StartStopSessionButton.Width = main_window.Width / 4;
+                    ResetSessionButton.Width = main_window.Width / 4;
+                    ResetSessionTextBlock.LineHeight = main_window.Width / 29.63;
                 }
             }
         }
@@ -173,11 +231,6 @@ namespace hourlyWorkTracker
             {
                 this.DragMove();
             }
-        }
-
-        private void closeApplication(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
         }
 
         private void openConfigureWindow(object sender, RoutedEventArgs e)
@@ -193,6 +246,24 @@ namespace hourlyWorkTracker
             }
         }
 
+        private void saveTotalMoney()
+        {
+            double temp;
+            bool success = double.TryParse(TotalMoneyDisplay.Text.Trim('$'), out temp);
+            if (success)
+            {
+                ApplicationSettingsStatic.TotalMoney = temp;
+            }
+        }
+
+        private void onLoaded(object sender, RoutedEventArgs e)
+        {
+            Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
+            current_money_display_location.X += CurrentMoneyDisplay.ActualWidth;
+            Canvas.SetLeft(MoneyEffect, current_money_display_location.X);
+            Canvas.SetTop(MoneyEffect, current_money_display_location.Y);
+        }
+
         private void onClosing(object sender, EventArgs e)
         {
             if (_running)
@@ -202,14 +273,9 @@ namespace hourlyWorkTracker
             saveTotalMoney();
         }
 
-        private void saveTotalMoney()
+        private void closeApplication(object sender, RoutedEventArgs e)
         {
-            double temp;
-            bool success = double.TryParse(TotalMoneyDisplay.Text.Trim('$'), out temp);
-            if (success)
-            {
-                ApplicationSettingsStatic.TotalMoney = temp;
-            }
+            Application.Current.Shutdown();
         }
     }
 }
