@@ -32,6 +32,7 @@
     </Window.ContextMenu>
     <Canvas Name="ContainerCanvas" Height="450" Width="800">
         <TextBlock Name="MoneyEffect" Text="$" Focusable="False" Visibility="Hidden" FontSize="50" Foreground="DarkGreen" Panel.ZIndex="2"/>
+        <TextBlock Name="MoneyEffect2" Text="$" Focusable="False" Visibility="Hidden" FontSize="50" Foreground="DarkGreen" Panel.ZIndex="2"/>
         <Grid Name="MainWindowGrid" Background="{StaticResource backgroundBrush}" Height="450" Width="800" Panel.ZIndex="0">
             <Rectangle x:Name="leftGrip"
                         Width="7"
