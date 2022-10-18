@@ -16,7 +16,7 @@ namespace hourlyWorkTracker
     /// </summary>
     public partial class App : Application
     {
-        private const string filename = "Settings.conf";
+        private const string filename = "appstate.conf";
 
         public Mutex? One_session
         { get; set; }
@@ -48,7 +48,10 @@ namespace hourlyWorkTracker
                     ApplicationSettingsStatic.OpacitySliderValue = Convert.ToDouble(allValues[0]);
                     ApplicationSettingsStatic.MainWindowOpacity = Convert.ToDouble(allValues[1]);
                     ApplicationSettingsStatic.HourlyWage = Convert.ToDouble(allValues[2]);
-                    ApplicationSettingsStatic.TotalMoney = Convert.ToDouble(allValues[3]);
+                    ApplicationSettingsStatic.CurrentSessionMoney = Convert.ToDouble(allValues[3]);
+                    ApplicationSettingsStatic.SessionStartTime = Convert.ToDateTime(allValues[4]);
+                    ApplicationSettingsStatic.SessionDuration = new TimeSpan(Convert.ToInt64(allValues[5]));
+                    ApplicationSettingsStatic.TotalMoney = Convert.ToDouble(allValues[6]);
                     sr.Close();
                     fs.Close();
                 }
@@ -57,7 +60,10 @@ namespace hourlyWorkTracker
             {
                 ApplicationSettingsStatic.OpacitySliderValue = 100.0;
                 ApplicationSettingsStatic.MainWindowOpacity = 1.0;
-                ApplicationSettingsStatic.HourlyWage = 0.0;
+                ApplicationSettingsStatic.HourlyWage = 50.0;
+                ApplicationSettingsStatic.CurrentSessionMoney = 0.0;
+                ApplicationSettingsStatic.SessionStartTime = DateTime.Now;
+                ApplicationSettingsStatic.SessionDuration = new TimeSpan(0);
                 ApplicationSettingsStatic.TotalMoney = 0.0;
             }
         }
@@ -70,6 +76,9 @@ namespace hourlyWorkTracker
                 sw.Write(ApplicationSettingsStatic.OpacitySliderValue + ",");
                 sw.Write(ApplicationSettingsStatic.MainWindowOpacity + ",");
                 sw.Write(ApplicationSettingsStatic.HourlyWage + ",");
+                sw.Write(ApplicationSettingsStatic.CurrentSessionMoney + ",");
+                sw.Write(ApplicationSettingsStatic.SessionStartTime + ",");
+                sw.Write(ApplicationSettingsStatic.SessionDuration.Ticks + ",");
                 sw.Write(ApplicationSettingsStatic.TotalMoney);
                 sw.Close();
                 fs.Close();

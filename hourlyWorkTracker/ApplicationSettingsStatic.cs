@@ -13,11 +13,18 @@ namespace hourlyWorkTracker
     {
         //private fields
         private static double _hourly_wage;
+        private static double _current_session_money;
         private static double _total_money;
         public static double OpacitySliderValue
         { get; set; }
 
         public static double MainWindowOpacity
+        { get; set; }
+
+        public static DateTime SessionStartTime
+        { get; set; }
+
+        public static TimeSpan SessionDuration
         { get; set; }
 
         public static double HourlyWage
@@ -30,6 +37,19 @@ namespace hourlyWorkTracker
             {
                 _hourly_wage = value;
                 HourlyWageChanged?.Invoke(null, EventArgs.Empty);
+            }
+        }
+
+        public static double CurrentSessionMoney
+        {
+            get
+            {
+                return _current_session_money;
+            }
+            set
+            {
+                _current_session_money = value;
+                CurrentSessionMoneyChanged?.Invoke(null, EventArgs.Empty);
             }
         }
 
@@ -47,6 +67,7 @@ namespace hourlyWorkTracker
         }
 
         public static event EventHandler? HourlyWageChanged;
+        public static event EventHandler? CurrentSessionMoneyChanged;
         public static event EventHandler? TotalMoneyChanged;
     }
 }

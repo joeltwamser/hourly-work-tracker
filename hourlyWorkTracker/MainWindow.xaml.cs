@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Timers;
 using System.Windows.Media.Animation;
+using System.IO;
 
 namespace hourlyWorkTracker
 {
@@ -25,10 +26,12 @@ namespace hourlyWorkTracker
     public partial class MainWindow : Window
     {
         //fields
+        private const string _session_log_filename = "Session Logs.csv";
         private bool resize_window_in_process;
         private const string _starting_money = "$0.00";
         private System.Timers.Timer _timer;
         private Stopwatch _stopwatch;
+        private Stopwatch _total_session_time;
         private bool _running = false;
         private DoubleAnimation _opacity_animation = new DoubleAnimation();
         private DoubleAnimation _money_effect_path_animation_X = new DoubleAnimation();
@@ -49,7 +52,7 @@ namespace hourlyWorkTracker
             Opacity = ApplicationSettingsStatic.MainWindowOpacity;
             ApplicationSettingsStatic.HourlyWageChanged += onHourlyWageChanged;
             ApplicationSettingsStatic.TotalMoneyChanged += onTotalMoneyChanged;
-            CurrentMoneyDisplay.Text = _starting_money;
+            CurrentMoneyDisplay.Text = "$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2");
             CurrentMoneyDisplay.FontWeight = FontWeights.Bold;
             TotalMoneyDisplay.Text = "$" + ApplicationSettingsStatic.TotalMoney.ToString("F2");
             TotalMoneyDisplay.FontWeight = FontWeights.Bold;
@@ -60,6 +63,7 @@ namespace hourlyWorkTracker
             createMoneyEffectAnimation(_opacity_animation2, _money_effect_path_animation_X2, _money_effect_path_animation_Y2, _money_effect_storyboard2, MoneyEffect2);
 
             _stopwatch = new Stopwatch();
+            _total_session_time = new Stopwatch();
             _timer = new System.Timers.Timer(10);
             _timer.Elapsed += onTimerElapse;
         }
@@ -87,7 +91,8 @@ namespace hourlyWorkTracker
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                double money_made_this_session = _stopwatch.Elapsed.TotalHours * ApplicationSettingsStatic.HourlyWage;
+                double money_made_this_session = (_stopwatch.Elapsed.TotalHours * ApplicationSettingsStatic.HourlyWage) + ApplicationSettingsStatic.CurrentSessionMoney;
+                double money_made_in_total = (_stopwatch.Elapsed.TotalHours * ApplicationSettingsStatic.HourlyWage) + ApplicationSettingsStatic.TotalMoney;
                 if (Math.Round(money_made_this_session,2) > Math.Round(money_made_last_iteration,2))
                 {
                     Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
@@ -116,7 +121,7 @@ namespace hourlyWorkTracker
                     money_made_last_iteration = money_made_this_session;
                 }
                 CurrentMoneyDisplay.Text = "$" + money_made_this_session.ToString("F2");
-                TotalMoneyDisplay.Text = "$" + (ApplicationSettingsStatic.TotalMoney + money_made_this_session).ToString("F2");
+                TotalMoneyDisplay.Text = "$" + money_made_in_total.ToString("F2");
             });
         }
 
@@ -124,7 +129,12 @@ namespace hourlyWorkTracker
         {
             if (!_running)
             {
+                if (ApplicationSettingsStatic.CurrentSessionMoney <= 0)
+                {
+                    ApplicationSettingsStatic.SessionStartTime = DateTime.Now;
+                }
                 _stopwatch.Start();
+                _total_session_time.Start();
                 _timer.Start();
                 StartStopSessionButton.Content = "Stop";
                 StartStopSessionButton.FontWeight = FontWeights.Bold;
@@ -134,6 +144,8 @@ namespace hourlyWorkTracker
             else
             {
                 _stopwatch.Stop();
+                _stopwatch.Reset();
+                _total_session_time.Stop();
                 _timer.Stop();
                 _money_effect_storyboard.Stop(this);
                 _money_effect_storyboard2.Stop(this);
@@ -142,16 +154,39 @@ namespace hourlyWorkTracker
                 StartStopSessionButton.Content = "Start";
                 StartStopSessionButton.FontWeight = FontWeights.Bold;
                 ResetSessionButton.IsEnabled = true;
+                ApplicationSettingsStatic.CurrentSessionMoney = save(CurrentMoneyDisplay);
+                ApplicationSettingsStatic.TotalMoney = save(TotalMoneyDisplay);
                 _running = false;
             }
         }
 
         private void onResetSessionClick(object sender, RoutedEventArgs e)
         {
-            _stopwatch.Reset();
+            
             money_made_last_iteration = 0.0;
-            CurrentMoneyDisplay.Text = _starting_money;
-            saveTotalMoney();
+            ApplicationSettingsStatic.TotalMoney = save(TotalMoneyDisplay);
+
+            //Write log of current money made to csv file
+            bool exists = File.Exists(_session_log_filename);
+            using (FileStream fs = new FileStream(_session_log_filename, FileMode.Append, FileAccess.Write))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                if(!exists)
+                {
+                    sw.WriteLine("Session Start Date,Session Duration (hh:mm:ss),Hourly Wage,Wages Earned");
+                }
+                //Possible eventual bug here in the formatting of the ApplicationSettingsStatic.SessionStartTime.ToString
+                //and the _stopwatch.Elapsed.ToString().  These haven't been heavily tested yet.
+                sw.Write(ApplicationSettingsStatic.SessionStartTime.ToString() + ",");
+                sw.Write((_total_session_time.Elapsed + ApplicationSettingsStatic.SessionDuration).ToString() + ",");
+                sw.Write("$" + ApplicationSettingsStatic.HourlyWage.ToString("F2") + "/hr,");
+                sw.WriteLine("$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2"));
+            }
+
+            _total_session_time.Reset();
+            ApplicationSettingsStatic.SessionDuration = new TimeSpan(0);
+            ApplicationSettingsStatic.CurrentSessionMoney = 0.0;
+            CurrentMoneyDisplay.Text = "$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2");
         }
 
         private void onHourlyWageChanged(object? sender, EventArgs e)
@@ -293,6 +328,7 @@ namespace hourlyWorkTracker
                     CurrentMoneyDisplay.FontSize = main_window.Width / 8;
                     TotalMoneyDisplay.FontSize = (main_window.Width / 8) * 0.6;
                     MoneyEffect.FontSize = main_window.Width / 16;
+                    MoneyEffect2.FontSize = main_window.Width / 16;
                     StartStopSessionButton.FontSize = main_window.Width / 30.77;
                     ResetSessionButton.FontSize = main_window.Width / 30.77;
                     StartStopSessionButton.Height = main_window.Width / 11.43;
@@ -301,6 +337,8 @@ namespace hourlyWorkTracker
                     ResetSessionButton.Width = main_window.Width / 4;
                     ResetSessionTextBlock.LineHeight = main_window.Width / 29.63;
                     radius = main_window.Width / 16;
+
+                    setMoneyEffectFromLocation();
                 }
             }
         }
@@ -328,17 +366,22 @@ namespace hourlyWorkTracker
             }
         }
 
-        private void saveTotalMoney()
+        private double save(TextBlock tb)
         {
             double temp;
-            bool success = double.TryParse(TotalMoneyDisplay.Text.Trim('$'), out temp);
+            bool success = double.TryParse(tb.Text.Trim('$'), out temp);
             if (success)
             {
-                ApplicationSettingsStatic.TotalMoney = temp;
+                return temp;
+            }
+            else
+            {
+                return -1;
             }
         }
 
-        private void onLoaded(object sender, RoutedEventArgs e)
+        //maybe make this more general later, and not a function specific to money effect
+        private void setMoneyEffectFromLocation()
         {
             Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
             current_money_display_location.X += CurrentMoneyDisplay.ActualWidth;
@@ -350,13 +393,20 @@ namespace hourlyWorkTracker
             _money_effect_path_animation_Y2.From = current_money_display_location.Y;
         }
 
+        private void onLoaded(object sender, RoutedEventArgs e)
+        {
+            setMoneyEffectFromLocation();
+        }
+
         private void onClosing(object sender, EventArgs e)
         {
             if (_running)
             {
                 onStartStopSessionClick(StartStopSessionButton, new RoutedEventArgs());
             }
-            saveTotalMoney();
+            //ApplicationSettingsStatic.CurrentSessionMoney = save(CurrentMoneyDisplay);
+            //ApplicationSettingsStatic.TotalMoney = save(TotalMoneyDisplay);
+            ApplicationSettingsStatic.SessionDuration += _total_session_time.Elapsed;
         }
 
         private void closeApplication(object sender, RoutedEventArgs e)

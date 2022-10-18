@@ -67,6 +67,19 @@ namespace hourlyWorkTracker
             {
                 temp = HourlyWageTextBox.Text.Replace(",", string.Empty);
                 successfullyParsedInput = double.TryParse(temp, out hourly_wage);
+                if (hourly_wage == 0)
+                {
+                    MessageBox.Show("Cannot Enter Hourly Wage of 0");
+                    HourlyWageTextBox.Clear();
+                    successfullyParsedInput = false;
+                }
+                else if (ApplicationSettingsStatic.CurrentSessionMoney > 0)
+                {
+                    MessageBox.Show("Cannot Edit Hourly Wage in the middle of a session.\n" +
+                        "Please reset and log this session before changing Hourly Wage.");
+                    HourlyWageTextBox.Clear();
+                    successfullyParsedInput= false;
+                }
             }
             else if (save_button.Name == "SaveTotalMoneyButton")
             {
@@ -85,7 +98,7 @@ namespace hourlyWorkTracker
                 TotalMoneyTextBox.Clear();
                 anotherSavedTextBlock.Visibility = Visibility.Visible;
             }
-            else
+            else if (successfullyParsedInput)
             {
                 MessageBox.Show("Incorrect format");
             }
