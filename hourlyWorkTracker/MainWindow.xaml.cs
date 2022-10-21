@@ -33,6 +33,9 @@ namespace hourlyWorkTracker
         private Stopwatch _stopwatch;
         private Stopwatch _total_session_time;
         private bool _running = false;
+        internal double money_made_last_iteration = 0.0;
+
+        //Dollar Sign Animation fields
         private DoubleAnimation _opacity_animation = new DoubleAnimation();
         private DoubleAnimation _money_effect_path_animation_X = new DoubleAnimation();
         private DoubleAnimation _money_effect_path_animation_Y = new DoubleAnimation();
@@ -41,10 +44,14 @@ namespace hourlyWorkTracker
         private DoubleAnimation _money_effect_path_animation_Y2 = new DoubleAnimation();
         private Storyboard _money_effect_storyboard;
         private Storyboard _money_effect_storyboard2;
-        internal double money_made_last_iteration = 0.0;
         private double radius = 75.0;
         private bool storyboard1 = true;
 
+        //Powers of Ten Animation fields
+        private DoubleAnimation _font_size_animation = new DoubleAnimation();
+        private ColorAnimation _foreground_animation = new ColorAnimation();
+        private Storyboard _powers_of_ten_storyboard;
+        private bool _POT_just_animated = false;
 
         public MainWindow()
         {
@@ -54,13 +61,19 @@ namespace hourlyWorkTracker
             ApplicationSettingsStatic.TotalMoneyChanged += onTotalMoneyChanged;
             CurrentMoneyDisplay.Text = "$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2");
             CurrentMoneyDisplay.FontWeight = FontWeights.Bold;
+            CurrentMoneyDisplayAddOn.FontWeight = FontWeights.Bold;
             TotalMoneyDisplay.Text = "$" + ApplicationSettingsStatic.TotalMoney.ToString("F2");
             TotalMoneyDisplay.FontWeight = FontWeights.Bold;
 
+            //Dollar Sign ($) Animation Instantiation
             _money_effect_storyboard = new Storyboard();
             _money_effect_storyboard2 = new Storyboard();
             createMoneyEffectAnimation(_opacity_animation, _money_effect_path_animation_X, _money_effect_path_animation_Y, _money_effect_storyboard, MoneyEffect);
             createMoneyEffectAnimation(_opacity_animation2, _money_effect_path_animation_X2, _money_effect_path_animation_Y2, _money_effect_storyboard2, MoneyEffect2);
+
+            //Powers of Ten Animation
+            _powers_of_ten_storyboard = new Storyboard();
+            createPowersOfTenAnimation(_font_size_animation, _foreground_animation, _powers_of_ten_storyboard, CurrentMoneyDisplayAddOn);
 
             _stopwatch = new Stopwatch();
             _total_session_time = new Stopwatch();
@@ -87,41 +100,125 @@ namespace hourlyWorkTracker
             Storyboard.SetTargetProperty(y, new PropertyPath(Canvas.TopProperty));
         }
 
+        private void createPowersOfTenAnimation(DoubleAnimation fs_anim, ColorAnimation c_anim, Storyboard st, FrameworkElement fe)
+        {
+            TextBlock _currentMoneyDisplayAddOn = (TextBlock)fe;
+            fs_anim.From = _currentMoneyDisplayAddOn.FontSize * 1.05;
+            fs_anim.To = _currentMoneyDisplayAddOn.FontSize;
+            //Maybe change this duration to persist longer than just 1 tick of the ticker.
+            //I.E. to last longer than just 1 $0.01, regardless of the hourly wage.
+            //This might look bad for really really large HourlyWages.
+            Duration duration = new Duration(TimeSpan.FromSeconds(36 / ApplicationSettingsStatic.HourlyWage));
+            fs_anim.Duration = duration;
+            c_anim.From = Colors.Gold;
+            c_anim.To = Colors.DarkGreen;
+            c_anim.Duration = duration;
+
+            st.Children.Add(fs_anim);
+            st.Children.Add(c_anim);
+            Storyboard.SetTargetName(fs_anim, fe.Name);
+            Storyboard.SetTargetProperty(fs_anim, new PropertyPath(FontSizeProperty));
+            Storyboard.SetTargetName(c_anim, fe.Name);
+            //Might have an issue here because apparently the Foreground Property
+            //of a TextBlock is a brush, not a color.
+            Storyboard.SetTargetProperty(c_anim, new PropertyPath("(Foreground).(Color)"));
+        }
+
+        private void dollarSignAnimation()
+        {
+            Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
+            current_money_display_location.X += CurrentMoneyDisplay.ActualWidth;
+            Random random = new Random();
+            double angle = (double)random.Next(235, 390) * Math.PI / 180.0;
+            Point destination = new Point(radius * Math.Cos(angle), radius * Math.Sin(angle));
+
+            if (storyboard1)
+            {
+                _money_effect_path_animation_X.To = destination.X + current_money_display_location.X;
+                _money_effect_path_animation_Y.To = destination.Y + current_money_display_location.Y;
+                _money_effect_storyboard.Begin(this);
+                MoneyEffect.Visibility = Visibility.Visible;
+                storyboard1 = false;
+            }
+            else
+            {
+                _money_effect_path_animation_X2.To = destination.X + current_money_display_location.X;
+                _money_effect_path_animation_Y2.To = destination.Y + current_money_display_location.Y;
+                _money_effect_storyboard2.Begin(this);
+                MoneyEffect2.Visibility = Visibility.Visible;
+                storyboard1 = true;
+            }
+        }
+
         private void onTimerElapse(object? sender, ElapsedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
                 double money_made_this_session = (_stopwatch.Elapsed.TotalHours * ApplicationSettingsStatic.HourlyWage) + ApplicationSettingsStatic.CurrentSessionMoney;
                 double money_made_in_total = (_stopwatch.Elapsed.TotalHours * ApplicationSettingsStatic.HourlyWage) + ApplicationSettingsStatic.TotalMoney;
-                if (Math.Round(money_made_this_session,2) > Math.Round(money_made_last_iteration,2))
-                {
-                    Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
-                    current_money_display_location.X += CurrentMoneyDisplay.ActualWidth;
-                    Random random = new Random();
-                    double angle = (double)random.Next(235,390) * Math.PI / 180.0;
-                    Point destination = new Point(radius * Math.Cos(angle), radius * Math.Sin(angle));
+                double mmts = Math.Round(money_made_this_session, 2);
+                double mmli = Math.Round(money_made_last_iteration, 2);
 
-                    if (storyboard1)
+                if (mmts > mmli)
+                {
+                    dollarSignAnimation();
+
+                    //Handle the POT Effect with the Ticker
+                    string nextToDisplay = "$" + money_made_this_session.ToString("F2");
+                    if (mmts % 1000 == 0)
                     {
-                        _money_effect_path_animation_X.To = destination.X + current_money_display_location.X;
-                        _money_effect_path_animation_Y.To = destination.Y + current_money_display_location.Y;
-                        _money_effect_storyboard.Begin(this);
-                        MoneyEffect.Visibility = Visibility.Visible;
-                        storyboard1 = false;
+                        CurrentMoneyDisplay.Text = "";
+                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.3;
+                        CurrentMoneyDisplayAddOn.Text = nextToDisplay;
+                        _powers_of_ten_storyboard.Begin(this);
+                        _POT_just_animated = true;
+                    }
+                    //In each of these sections, nextToDisplay is guaranteed to have a Length of 6, 5, 4, then 3.
+                    else if (mmts % 100 == 0)
+                    {
+                        CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 6);
+                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.25;
+                        CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 6);
+                        _powers_of_ten_storyboard.Begin(this);
+                        _POT_just_animated = true;
+                    }
+                    else if (mmts % 10 == 0)
+                    {
+                        CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 5);
+                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.2;
+                        CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 5);
+                        _powers_of_ten_storyboard.Begin(this);
+                        _POT_just_animated = true;
+                    }
+                    else if (mmts % 1 == 0)
+                    {
+                        CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 4);
+                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.15;
+                        CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 4);
+                        _powers_of_ten_storyboard.Begin(this);
+                        _POT_just_animated = true;
+                    }
+                    //Also I don't update the POT animation when I change my hourly wage.
+                    else if ((mmts * 10) % 1 == 0)
+                    {
+                        CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 2);
+                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.05;
+                        CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 2);
+                        _powers_of_ten_storyboard.Begin(this);
+                        _POT_just_animated = true;
                     }
                     else
                     {
-                        _money_effect_path_animation_X2.To = destination.X + current_money_display_location.X;
-                        _money_effect_path_animation_Y2.To = destination.Y + current_money_display_location.Y;
-                        _money_effect_storyboard2.Begin(this);
-                        MoneyEffect2.Visibility = Visibility.Visible;
-                        storyboard1 = true;
+                        if (_POT_just_animated)
+                        {
+                            CurrentMoneyDisplayAddOn.Text = "";
+                        }
+                        CurrentMoneyDisplay.Text = nextToDisplay;
+                        _POT_just_animated = false;
                     }
-                    
+                    TotalMoneyDisplay.Text = "$" + money_made_in_total.ToString("F2");
                     money_made_last_iteration = money_made_this_session;
                 }
-                CurrentMoneyDisplay.Text = "$" + money_made_this_session.ToString("F2");
-                TotalMoneyDisplay.Text = "$" + money_made_in_total.ToString("F2");
             });
         }
 
@@ -151,6 +248,7 @@ namespace hourlyWorkTracker
                 _money_effect_storyboard2.Stop(this);
                 MoneyEffect.Visibility = Visibility.Hidden;
                 MoneyEffect2.Visibility = Visibility.Hidden;
+                _powers_of_ten_storyboard.Stop(this);
                 StartStopSessionButton.Content = "Start";
                 StartStopSessionButton.FontWeight = FontWeights.Bold;
                 ResetSessionButton.IsEnabled = true;
@@ -192,12 +290,15 @@ namespace hourlyWorkTracker
         private void onHourlyWageChanged(object? sender, EventArgs e)
         {
             Duration d = new Duration(TimeSpan.FromSeconds(72 / ApplicationSettingsStatic.HourlyWage));
+            Duration d2 = new Duration(TimeSpan.FromSeconds(36 / ApplicationSettingsStatic.HourlyWage));
             _opacity_animation.Duration = d;
             _opacity_animation2.Duration = d;
             _money_effect_path_animation_X.Duration = d;
             _money_effect_path_animation_Y.Duration = d;
             _money_effect_path_animation_X2.Duration = d;
             _money_effect_path_animation_Y2.Duration = d;
+            _font_size_animation.Duration = d2;
+            _foreground_animation.Duration = d2;
             money_made_last_iteration = 0.0;
         }
 
@@ -326,6 +427,7 @@ namespace hourlyWorkTracker
                     //define these in the constructor probably.  That'd probably be at least
                     //better since I'm already doing it this way.
                     CurrentMoneyDisplay.FontSize = main_window.Width / 8;
+                    CurrentMoneyDisplayAddOn.FontSize = main_window.Width / 8;
                     TotalMoneyDisplay.FontSize = (main_window.Width / 8) * 0.6;
                     MoneyEffect.FontSize = main_window.Width / 16;
                     MoneyEffect2.FontSize = main_window.Width / 16;

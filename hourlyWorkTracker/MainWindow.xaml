@@ -82,8 +82,11 @@
                         VerticalAlignment="Bottom"
                         Cursor="SizeNESW"
                         Style="{StaticResource GripArea}" />
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical" Panel.ZIndex="1">
-                <TextBlock Name="CurrentMoneyDisplay" HorizontalAlignment="Center" FontSize="100" Foreground="DarkGreen"></TextBlock>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical" Panel.ZIndex="2">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Panel.ZIndex="3">
+                    <TextBlock Name="CurrentMoneyDisplay" HorizontalAlignment="Center" FontSize="100" Foreground="DarkGreen"></TextBlock>
+                    <TextBlock Name="CurrentMoneyDisplayAddOn" HorizontalAlignment="Center" FontSize="100" Foreground="DarkGreen"></TextBlock>
+                </StackPanel>
                 <TextBlock Name="TotalMoneyDisplay" HorizontalAlignment="Center" FontSize="60" Foreground="DarkGreen"></TextBlock>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
                     <Button Name="StartStopSessionButton" Margin="0,10,5,0" FontSize="26" Height="70" Width="200" Background="{StaticResource moneyColor}" Click="onStartStopSessionClick">
