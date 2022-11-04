@@ -119,15 +119,13 @@ namespace hourlyWorkTracker
             Storyboard.SetTargetName(fs_anim, fe.Name);
             Storyboard.SetTargetProperty(fs_anim, new PropertyPath(FontSizeProperty));
             Storyboard.SetTargetName(c_anim, fe.Name);
-            //Might have an issue here because apparently the Foreground Property
-            //of a TextBlock is a brush, not a color.
             Storyboard.SetTargetProperty(c_anim, new PropertyPath("(Foreground).(Color)"));
         }
 
         private void dollarSignAnimation()
         {
-            Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
-            current_money_display_location.X += CurrentMoneyDisplay.ActualWidth;
+            Point current_money_display_location = CurrentMoneyDisplayAddOn.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
+            current_money_display_location.X += CurrentMoneyDisplayAddOn.ActualWidth;
             Random random = new Random();
             double angle = (double)random.Next(235, 390) * Math.PI / 180.0;
             Point destination = new Point(radius * Math.Cos(angle), radius * Math.Sin(angle));
@@ -136,7 +134,7 @@ namespace hourlyWorkTracker
             {
                 _money_effect_path_animation_X.To = destination.X + current_money_display_location.X;
                 _money_effect_path_animation_Y.To = destination.Y + current_money_display_location.Y;
-                _money_effect_storyboard.Begin(this);
+                _money_effect_storyboard.Begin(this, true);
                 MoneyEffect.Visibility = Visibility.Visible;
                 storyboard1 = false;
             }
@@ -144,7 +142,7 @@ namespace hourlyWorkTracker
             {
                 _money_effect_path_animation_X2.To = destination.X + current_money_display_location.X;
                 _money_effect_path_animation_Y2.To = destination.Y + current_money_display_location.Y;
-                _money_effect_storyboard2.Begin(this);
+                _money_effect_storyboard2.Begin(this, true);
                 MoneyEffect2.Visibility = Visibility.Visible;
                 storyboard1 = true;
             }
@@ -168,43 +166,48 @@ namespace hourlyWorkTracker
                     if (mmts % 1000 == 0)
                     {
                         CurrentMoneyDisplay.Text = "";
-                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.3;
+                        _font_size_animation.From = CurrentMoneyDisplay.FontSize * 1.3;
+                        _font_size_animation.To = CurrentMoneyDisplay.FontSize;
                         CurrentMoneyDisplayAddOn.Text = nextToDisplay;
-                        _powers_of_ten_storyboard.Begin(this);
+                        _powers_of_ten_storyboard.Begin(CurrentMoneyDisplayAddOn, true);
                         _POT_just_animated = true;
                     }
                     //In each of these sections, nextToDisplay is guaranteed to have a Length of 6, 5, 4, then 3.
                     else if (mmts % 100 == 0)
                     {
                         CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 6);
-                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.25;
+                        _font_size_animation.From = CurrentMoneyDisplay.FontSize * 1.25;
+                        _font_size_animation.To = CurrentMoneyDisplay.FontSize;
                         CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 6);
-                        _powers_of_ten_storyboard.Begin(this);
+                        _powers_of_ten_storyboard.Begin(CurrentMoneyDisplayAddOn, true);
                         _POT_just_animated = true;
                     }
                     else if (mmts % 10 == 0)
                     {
                         CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 5);
-                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.2;
+                        _font_size_animation.From = CurrentMoneyDisplay.FontSize * 1.2;
+                        _font_size_animation.To = CurrentMoneyDisplay.FontSize;
                         CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 5);
-                        _powers_of_ten_storyboard.Begin(this);
+                        _powers_of_ten_storyboard.Begin(CurrentMoneyDisplayAddOn, true);
                         _POT_just_animated = true;
                     }
                     else if (mmts % 1 == 0)
                     {
                         CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 4);
-                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.15;
+                        _font_size_animation.From = CurrentMoneyDisplay.FontSize * 1.15;
+                        _font_size_animation.To = CurrentMoneyDisplay.FontSize;
                         CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 4);
-                        _powers_of_ten_storyboard.Begin(this);
+                        _powers_of_ten_storyboard.Begin(CurrentMoneyDisplayAddOn, true);
                         _POT_just_animated = true;
                     }
                     //Also I don't update the POT animation when I change my hourly wage.
                     else if ((mmts * 10) % 1 == 0)
                     {
                         CurrentMoneyDisplay.Text = nextToDisplay.Substring(0, nextToDisplay.Length - 2);
-                        _font_size_animation.From = CurrentMoneyDisplayAddOn.FontSize * 1.05;
+                        _font_size_animation.From = CurrentMoneyDisplay.FontSize * 1.05;
+                        _font_size_animation.To = CurrentMoneyDisplay.FontSize;
                         CurrentMoneyDisplayAddOn.Text = nextToDisplay.Substring(nextToDisplay.Length - 2);
-                        _powers_of_ten_storyboard.Begin(this);
+                        _powers_of_ten_storyboard.Begin(CurrentMoneyDisplayAddOn, true);
                         _POT_just_animated = true;
                     }
                     else
@@ -212,6 +215,7 @@ namespace hourlyWorkTracker
                         if (_POT_just_animated)
                         {
                             CurrentMoneyDisplayAddOn.Text = "";
+                            _powers_of_ten_storyboard.Stop();
                         }
                         CurrentMoneyDisplay.Text = nextToDisplay;
                         _POT_just_animated = false;
@@ -248,6 +252,16 @@ namespace hourlyWorkTracker
                 _money_effect_storyboard2.Stop(this);
                 MoneyEffect.Visibility = Visibility.Hidden;
                 MoneyEffect2.Visibility = Visibility.Hidden;
+
+                //If the Powers of Ten animation is currently running
+                if (_powers_of_ten_storyboard.GetCurrentState(CurrentMoneyDisplayAddOn) == 0)
+                {
+                    string temp = CurrentMoneyDisplay.Text + CurrentMoneyDisplayAddOn.Text;
+                    CurrentMoneyDisplayAddOn.Text = "";
+                    CurrentMoneyDisplay.Text = temp;
+                    _POT_just_animated = false;
+                }
+
                 _powers_of_ten_storyboard.Stop(this);
                 StartStopSessionButton.Content = "Start";
                 StartStopSessionButton.FontWeight = FontWeights.Bold;
@@ -427,7 +441,13 @@ namespace hourlyWorkTracker
                     //define these in the constructor probably.  That'd probably be at least
                     //better since I'm already doing it this way.
                     CurrentMoneyDisplay.FontSize = main_window.Width / 8;
-                    CurrentMoneyDisplayAddOn.FontSize = main_window.Width / 8;
+                    _font_size_animation.From = CurrentMoneyDisplay.FontSize * 1.05;
+                    _font_size_animation.To = CurrentMoneyDisplay.FontSize;
+                    //this doesn't seem right but its the only way I could figure out how to
+                    //update CurrentMoneyDisplayAddOn's FontSize once the animations start locking it out.
+                    _powers_of_ten_storyboard.Begin(this);
+                    _powers_of_ten_storyboard.Stop(this);
+
                     TotalMoneyDisplay.FontSize = (main_window.Width / 8) * 0.6;
                     MoneyEffect.FontSize = main_window.Width / 16;
                     MoneyEffect2.FontSize = main_window.Width / 16;
@@ -485,8 +505,8 @@ namespace hourlyWorkTracker
         //maybe make this more general later, and not a function specific to money effect
         private void setMoneyEffectFromLocation()
         {
-            Point current_money_display_location = CurrentMoneyDisplay.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
-            current_money_display_location.X += CurrentMoneyDisplay.ActualWidth;
+            Point current_money_display_location = CurrentMoneyDisplayAddOn.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0));
+            current_money_display_location.X += CurrentMoneyDisplayAddOn.ActualWidth;
             Canvas.SetLeft(MoneyEffect, current_money_display_location.X);
             Canvas.SetTop(MoneyEffect, current_money_display_location.Y);
             _money_effect_path_animation_X.From = current_money_display_location.X;
