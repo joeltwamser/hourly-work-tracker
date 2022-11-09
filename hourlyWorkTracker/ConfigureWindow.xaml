@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:hourlyWorkTracker"
         mc:Ignorable="d" Title="ConfigureWindow" Height="500" Width="500" MinWidth="250">
     <Window.Resources>
@@ -52,12 +53,29 @@
                     </StackPanel>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="UI Layout">
-                <Label Content="Various UI Options Go Here..." />
-            </TabItem>
-            <TabItem Header="Opacity">
+            <TabItem Header="Customize UI">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock FontSize="16" Margin="7,3,0,0"><Bold>Opacity:</Bold></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Style="{StaticResource TextBlockHeadingSettings}" Grid.Row="0" Grid.Column="0"><Bold>Border Color:</Bold></TextBlock>
+                        <TextBlock Style="{StaticResource TextBlockHeadingSettings}" Grid.Row="0" Grid.Column="1"><Bold>Text Color:</Bold></TextBlock>
+                        <xctk:ColorPicker Name="BorderColorPicker" Margin="4" Grid.Row="1" Grid.Column="0"></xctk:ColorPicker>
+                        <xctk:ColorPicker Name="TextColorPicker" Margin="4" Grid.Row="1" Grid.Column="1"></xctk:ColorPicker>
+                        <TextBlock Style="{StaticResource TextBlockHeadingSettings}" Grid.Row="2" Grid.Column="0"><Bold>Button Color:</Bold></TextBlock>
+                        <TextBlock Style="{StaticResource TextBlockHeadingSettings}" Grid.Row="2" Grid.Column="1"><Bold>Background Color Color:</Bold></TextBlock>
+                        <xctk:ColorPicker Name="ButtonColorPicker" Margin="4" Grid.Row="3" Grid.Column="0"></xctk:ColorPicker>
+                        <xctk:ColorPicker Name="BackgroundColorPicker" Margin="4" Grid.Row="3" Grid.Column="1"></xctk:ColorPicker>
+                    </Grid>
+                    <TextBlock Style="{StaticResource TextBlockHeadingSettings}"><Bold>Opacity:</Bold></TextBlock>
                     <Slider Name="OpacitySlider" Margin="10" Minimum="10" Maximum="100" ValueChanged="updateMainWindowOpacity"/>
                 </StackPanel>
             </TabItem>

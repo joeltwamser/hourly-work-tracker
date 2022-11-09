@@ -274,31 +274,33 @@ namespace hourlyWorkTracker
 
         private void onResetSessionClick(object sender, RoutedEventArgs e)
         {
-            
-            money_made_last_iteration = 0.0;
-            ApplicationSettingsStatic.TotalMoney = save(TotalMoneyDisplay);
-
-            //Write log of current money made to csv file
-            bool exists = File.Exists(_session_log_filename);
-            using (FileStream fs = new FileStream(_session_log_filename, FileMode.Append, FileAccess.Write))
-            using (StreamWriter sw = new StreamWriter(fs))
+            if (MessageBox.Show("Resetting Session...\nAre you sure?", "Confirmation",
+            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if(!exists)
-                {
-                    sw.WriteLine("Session Start Date,Session Duration (hh:mm:ss),Hourly Wage,Wages Earned");
-                }
-                //Possible eventual bug here in the formatting of the ApplicationSettingsStatic.SessionStartTime.ToString
-                //and the _stopwatch.Elapsed.ToString().  These haven't been heavily tested yet.
-                sw.Write(ApplicationSettingsStatic.SessionStartTime.ToString() + ",");
-                sw.Write((_total_session_time.Elapsed + ApplicationSettingsStatic.SessionDuration).ToString() + ",");
-                sw.Write("$" + ApplicationSettingsStatic.HourlyWage.ToString("F2") + "/hr,");
-                sw.WriteLine("$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2"));
-            }
+                money_made_last_iteration = 0.0;
+                ApplicationSettingsStatic.TotalMoney = save(TotalMoneyDisplay);
 
-            _total_session_time.Reset();
-            ApplicationSettingsStatic.SessionDuration = new TimeSpan(0);
-            ApplicationSettingsStatic.CurrentSessionMoney = 0.0;
-            CurrentMoneyDisplay.Text = "$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2");
+                //Write log of current money made to csv file
+                bool exists = File.Exists(_session_log_filename);
+                using (FileStream fs = new FileStream(_session_log_filename, FileMode.Append, FileAccess.Write))
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    if (!exists)
+                    {
+                        sw.WriteLine("Session Start Date,Session Duration (hh:mm:ss),Hourly Wage,Wages Earned");
+                    }
+                    //Possible eventual bug here in the formatting of the ApplicationSettingsStatic.SessionStartTime.ToString
+                    //and the _stopwatch.Elapsed.ToString().  These haven't been heavily tested yet.
+                    sw.Write(ApplicationSettingsStatic.SessionStartTime.ToString() + ",");
+                    sw.Write((_total_session_time.Elapsed + ApplicationSettingsStatic.SessionDuration).ToString() + ",");
+                    sw.Write("$" + ApplicationSettingsStatic.HourlyWage.ToString("F2") + "/hr,");
+                    sw.WriteLine("$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2"));
+                }
+                _total_session_time.Reset();
+                ApplicationSettingsStatic.SessionDuration = new TimeSpan(0);
+                ApplicationSettingsStatic.CurrentSessionMoney = 0.0;
+                CurrentMoneyDisplay.Text = "$" + ApplicationSettingsStatic.CurrentSessionMoney.ToString("F2");
+            }
         }
 
         private void onHourlyWageChanged(object? sender, EventArgs e)
