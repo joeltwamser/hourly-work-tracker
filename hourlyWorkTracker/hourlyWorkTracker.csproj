@@ -11,4 +11,10 @@
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Commands\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
 </Project>
