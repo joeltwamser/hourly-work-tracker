@@ -5,11 +5,54 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:hourlyWorkTracker"
+        xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
         mc:Ignorable="d" Title="ConfigureWindow" Height="500" Width="500">
     <Window.Resources>
-        
+        <Style x:Key="SubHeading" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Margin" Value="4" />
+        </Style>
     </Window.Resources>
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <TabItem Header="Customize UI">
+                <Grid Margin="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="0" Grid.Column="0">Border Color:</TextBlock>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="0" Grid.Column="1">Text Color:</TextBlock>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="2" Grid.Column="0">Button Color:</TextBlock>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="2" Grid.Column="1">Main Window Color:</TextBlock>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="0">Opacity:</TextBlock>
+                    <!--I gotta somehow make sure I'm writing my data to the same file.  Not currently sure of how to do that.-->
+                    <Slider Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="6" Minimum="0.1" Maximum="1.0"
+                            Value="{Binding Path=MyApplicationBehavior.Opacity, Mode=TwoWay}"></Slider>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Grid.Row="1" Grid.Column="1" Margin="6">
+            <Viewbox>
+                <TextBlock>Close</TextBlock>
+            </Viewbox>
+        </Button>
     </Grid>
 </Window>

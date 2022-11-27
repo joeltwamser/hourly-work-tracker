@@ -4,27 +4,45 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:hourlyWorkTracker"
+        xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
         mc:Ignorable="d"
         Title="Hourly Wage Ticker" WindowStyle="None" ResizeMode="CanResize" AllowsTransparency="True"
-        Height="450" Width="800">
+        Height="450" Width="800" Opacity="{Binding MyApplicationBehavior.Opacity}" x:Name="HWTMainWindow">
+    <Window.DataContext>
+        <vm:ApplicationBehaviorViewModel/>
+    </Window.DataContext>
     <Window.Resources>
+        <local:ConfigureWindow x:Key="TheConfigureWindow"/>
         <Style TargetType="Grid">
-            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Background" Value="{Binding MyApplicationBehavior.GridBackground}"/>
         </Style>
         <Style TargetType="Rectangle">
-            <Setter Property="Fill" Value="#118C4F"/>
+            <Setter Property="Fill" Value="{Binding MyApplicationBehavior.RectangleFill}"/>
         </Style>
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#118C4F"/>
+            <Setter Property="Background" Value="{Binding MyApplicationBehavior.ButtonBackground}"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
+        <Style TargetType="TextBlock" x:Key="Ticker">
+            <Setter Property="Foreground" Value="{Binding MyApplicationBehavior.TextBlockForeground}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{Binding MyApplicationBehavior.TextBlockFontFamily}"/>
+        </Style>
     </Window.Resources>
+    <!--Command parameter is JUST passing this window.  Apparently it's not part of the visual tree so you can't just bind to ElementName or something.-->
+    <Window.ContextMenu>
+        <ContextMenu StaysOpen="True">
+            <MenuItem Header="Configure" Command="{Binding OpenConfigureWindow}" CommandParameter="{StaticResource TheConfigureWindow}"/>
+            <MenuItem Header="Close" Command="{Binding CloseApplication}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget}"/>
+        </ContextMenu>
+    </Window.ContextMenu>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="7"/>
+            <RowDefinition Height="5*"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="4*"/>
             <RowDefinition Height="7"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -49,15 +67,23 @@
                    Grid.Row="0" Grid.Column="3"/>
         <Rectangle x:Name="bottomLeftGrip" Cursor="SizeNESW"
                    Grid.Row="4" Grid.Column="0"/>
-        <Button Grid.Row="3" Grid.Column="1" Margin="172,10,10,68">
-            <Viewbox Margin="18">
+        <Viewbox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,50,0,0"
+                 HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Style="{StaticResource Ticker}">Test</TextBlock>
+        </Viewbox>
+        <Viewbox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0"
+                 HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Style="{StaticResource Ticker}">Test</TextBlock>
+        </Viewbox>
+        <Button Grid.Row="3" Grid.Column="1" Margin="172,20,10,68">
+            <Viewbox Margin="9">
                 <TextBlock>Start</TextBlock>
             </Viewbox>
         </Button>
-        <Button Grid.Row="3" Grid.Column="2" Margin="10,10,172,68">
-            <Viewbox Margin="3">
+        <Button Grid.Row="3" Grid.Column="2" Margin="10,20,172,68">
+            <Viewbox Margin="3,6,3,3">
                 <TextBlock TextAlignment="Center" LineStackingStrategy="BlockLineHeight"
-                           LineHeight="12">Reset+Store<LineBreak/>Session</TextBlock>
+                           LineHeight="11">Reset+Store<LineBreak/>Session</TextBlock>
             </Viewbox>
         </Button>
     </Grid>
