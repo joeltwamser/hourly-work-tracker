@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="hourlyWorkTracker.Views.ConfigureView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:hourlyWorkTracker"
+        xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
+        d:DataContext="{d:DesignInstance Type=vm:ConfigureWindowViewModel}"
+        mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="500">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <Style TargetType="TextBlock" x:Key="SubHeading">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="19" />
+            <Setter Property="Margin" Value="3,3,3,0" />
+        </Style>
+        <Style TargetType="xctk:ColorPicker">
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="TinyHeading">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="5,0,0,0"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Saved">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="Green"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="8,2,3,3"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="SaveButtonText">
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <TabItem Header="Ticker/Tracker Info">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="0" Grid.Column="0">Update Hourly Wage:</TextBlock>
+                    <TextBlock Style="{StaticResource TinyHeading}" Grid.Row="1" Grid.Column="0">(Format ex: ##.##)</TextBlock>
+                    <TextBox Name="HourlyWageTextBox" Grid.Row="2" Grid.Column="0"></TextBox>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="3" Grid.Column="0">Update Total Money Made:</TextBlock>
+                    <TextBlock Style="{StaticResource TinyHeading}" Grid.Row="4" Grid.Column="0">(Format ex: #########.##)</TextBlock>
+                    <TextBox Name="TotalMoneyTextBox" Grid.Row="5" Grid.Column="0"></TextBox>
+                    <Button Grid.Row="2" Grid.Column="1" Command="{Binding SaveHourlyWage}" CommandParameter="{Binding ElementName=HourlyWageTextBox}">
+                        <TextBlock Style="{StaticResource SaveButtonText}" Text="Save"/>
+                    </Button>
+                    <TextBlock Visibility="{Binding MyApplicationBehavior.HourlyWageChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                               Style="{StaticResource Saved}" Grid.Row="2" Grid.Column="2">SAVED!!!</TextBlock>
+                    <Button Grid.Row="5" Grid.Column="1" Command="{Binding SaveTotalMoneyMade}" CommandParameter="{Binding ElementName=TotalMoneyTextBox}">
+                        <TextBlock Style="{StaticResource SaveButtonText}" Text="Save"/>
+                    </Button>
+                    <TextBlock Visibility="{Binding MyApplicationBehavior.TotalMoneyMadeChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                               Style="{StaticResource Saved}" Grid.Row="5" Grid.Column="2">SAVED!!!</TextBlock>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Customize UI">
+                <Grid Margin="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="0" Grid.Column="0">Border Color:</TextBlock>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="0" Grid.Column="1">Ticker Color:</TextBlock>
+                    <xctk:ColorPicker Grid.Row="1" Grid.Column="0" SelectedColor="{Binding Path=MyApplicationBehavior.RectangleFill, Mode=TwoWay}"></xctk:ColorPicker>
+                    <xctk:ColorPicker Grid.Row="1" Grid.Column="1" SelectedColor="{Binding Path=MyApplicationBehavior.TickerForeground, Mode=TwoWay}"></xctk:ColorPicker>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Margin="3,3,3,28" Grid.RowSpan="2">Button Color:</TextBlock>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="2" Grid.Column="1">Tracker Window Color:</TextBlock>
+                    <xctk:ColorPicker Grid.Row="3" Grid.Column="0" SelectedColor="{Binding Path=MyApplicationBehavior.ButtonBackground, Mode=TwoWay}"></xctk:ColorPicker>
+                    <xctk:ColorPicker Grid.Row="3" Grid.Column="1" SelectedColor="{Binding Path=MyApplicationBehavior.GridBackground, Mode=TwoWay}"></xctk:ColorPicker>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="0">Button Text Color:</TextBlock>
+                    <xctk:ColorPicker Grid.Row="5" Grid.Column="0" SelectedColor="{Binding Path=MyApplicationBehavior.ButtonTextForeground, Mode=TwoWay}"></xctk:ColorPicker>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="1">Opacity:</TextBlock>
+                    <Slider Grid.Row="5" Grid.Column="1" Margin="6" Minimum="0.1" Maximum="1.0"
+                            Value="{Binding Path=MyApplicationBehavior.Opacity, Mode=TwoWay}"></Slider>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Grid.Row="1" Grid.Column="1" Margin="6" Command="{Binding CloseWindow}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+            <Viewbox Margin="2">
+                <TextBlock>Close</TextBlock>
+            </Viewbox>
+        </Button>
+    </Grid>
+</UserControl>

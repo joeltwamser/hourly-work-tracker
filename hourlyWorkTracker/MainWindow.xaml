@@ -1,0 +1,20 @@
+﻿<Window x:Class="hourlyWorkTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:hourlyWorkTracker"
+        xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
+        mc:Ignorable="d" WindowStyle="None" ResizeMode="CanResize" AllowsTransparency="True"
+        Title="MainWindow" Height="450" Width="800" Content="{Binding}">
+    <Window.DataContext>
+        <vm:TrackerWindowViewModel/>
+    </Window.DataContext>
+    <Window.ContextMenu>
+        <ContextMenu StaysOpen="True">
+            <MenuItem Header="Configure" Command="{Binding OpenConfigureWindow}"/>
+            <MenuItem Header="Close" Command="{Binding CloseWindow}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget}"/>
+        </ContextMenu>
+    </Window.ContextMenu>
+</Window>
