@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Data;
-using System.Windows;
 using hourlyWorkTracker.Models;
 using hourlyWorkTracker.Commands;
 using System.Windows.Controls;
+using hourlyWorkTracker.Views;
+using System.Windows;
+using System.Timers;
+using System.Diagnostics;
 
 namespace hourlyWorkTracker.ViewModels
 {
@@ -20,7 +18,13 @@ namespace hourlyWorkTracker.ViewModels
         {
             Color myGreen = (Color)System.Windows.Media.ColorConverter.ConvertFromString("#118C4F");
             _my_application_behavior = new ApplicationBehavior(myGreen, myGreen, myGreen, Colors.Black, Colors.Black, 1.0,
-                25, false, 0.0, false);
+                25, false, 0.0, false, 0.0, false, "Start");
+
+            _start_stop_timer = new Timer(10);
+            _start_stop_timer.Elapsed += OnTimerElapse;
+            _stopwatch = new Stopwatch();
+            _money_made_this_session_holder = 0;
+            _total_money_made_holder = 0;
         }
 
         protected ApplicationBehavior _my_application_behavior;
@@ -28,6 +32,12 @@ namespace hourlyWorkTracker.ViewModels
         protected ICommand? _close_window;
         protected ICommand? _save_hourly_wage;
         protected ICommand? _save_total_money_made;
+        protected ICommand? _start_stop_tracker;
+        protected ICommand? _reset_and_store;
+        protected Timer _start_stop_timer;
+        protected Stopwatch _stopwatch;
+        protected double _money_made_this_session_holder;
+        protected double _total_money_made_holder;
 
         public ApplicationBehavior MyApplicationBehavior
         {
@@ -44,6 +54,7 @@ namespace hourlyWorkTracker.ViewModels
             return true;
         }
 
+        //Maybe eventually make this general to just (OpenWindow)
         public ICommand OpenConfigureWindow
         {
             get
@@ -56,13 +67,13 @@ namespace hourlyWorkTracker.ViewModels
             }
         }
 
-        protected virtual void OpenConfigureWindowExecute(object? parameter)
+        protected void OpenConfigureWindowExecute(object? parameter)
         {
-            if (parameter is Window a)
+            Window w = new ConfigureView
             {
-                a.DataContext = this;
-                a.Show();
-            }
+                DataContext = this
+            };
+            w.Show();
         }
 
         public ICommand CloseWindow
@@ -77,10 +88,12 @@ namespace hourlyWorkTracker.ViewModels
             }
         }
 
-        protected virtual void CloseWindowExecute(object? parameter)
+        protected void CloseWindowExecute(object? parameter)
         {
-            if (parameter is Window a)
-                a.Close();
+            if (parameter is Window w)
+            {
+                w.Close();
+            }
         }
 
         public ICommand SaveHourlyWage
@@ -95,7 +108,7 @@ namespace hourlyWorkTracker.ViewModels
             }
         }
 
-        public void SaveHourlyWageExecute(object? parameter)
+        protected void SaveHourlyWageExecute(object? parameter)
         {
             if (parameter is TextBox tb)
             {
@@ -105,7 +118,6 @@ namespace hourlyWorkTracker.ViewModels
                     MyApplicationBehavior.HourlyWage = Math.Round(result, 2);
                     tb.Clear();
                 }
-                //MyApplicationBehavior.HourlyWageChanged = false;
             }
         }
 
@@ -121,7 +133,7 @@ namespace hourlyWorkTracker.ViewModels
             }
         }
 
-        public void SaveTotalMoneyMadeExecute(object? parameter)
+        protected void SaveTotalMoneyMadeExecute(object? parameter)
         {
             if (parameter is TextBox tb)
             {
@@ -131,13 +143,81 @@ namespace hourlyWorkTracker.ViewModels
                     MyApplicationBehavior.TotalMoneyMade = Math.Round(result, 2);
                     tb.Clear();
                 }
-                //MyApplicationBehavior.TotalMoneyMadeChanged = false;
             }
         }
 
-        public bool TextBoxCanExecute(object? parameter)
+        protected bool TextBoxCanExecute(object? parameter)
         {
             return parameter is TextBox tb && !string.IsNullOrEmpty(tb.Text);
+        }
+
+        public ICommand StartStopTracker
+        {
+            get
+            {
+                if (_start_stop_tracker == null)
+                {
+                    _start_stop_tracker = new Command(StartStopTrackerExecute, GenericReturnTrue);
+                }
+                return _start_stop_tracker;
+            }
+        }
+
+        protected void StartStopTrackerExecute(object? parameter)
+        {
+            if (!MyApplicationBehavior.TrackerRunning)
+            {
+                MyApplicationBehavior.TrackerRunning = true;
+                MyApplicationBehavior.StartStopButtonText = "Stop";
+                _money_made_this_session_holder = MyApplicationBehavior.MoneyMadeThisSession;
+                _total_money_made_holder = MyApplicationBehavior.TotalMoneyMade;
+                _start_stop_timer.Start();
+                _stopwatch.Start();
+            }
+            else
+            {
+                MyApplicationBehavior.TrackerRunning = false;
+                MyApplicationBehavior.StartStopButtonText = "Start";
+                _start_stop_timer.Stop();
+                _stopwatch.Stop();
+                _stopwatch.Reset();
+            }
+        }
+
+        public ICommand ResetAndStore
+        {
+            get
+            {
+                if (_reset_and_store == null)
+                {
+                    _reset_and_store = new Command(ResetAndStoreExecute, ResetAndStoreCanExecute);
+                }
+                return _reset_and_store;
+            }
+        }
+
+        //Here we will have to 0 out MyApplicationBehavior.MoneyMadeThisSession
+        //and _money_made_this_session_holder
+        protected void ResetAndStoreExecute(object? parameter)
+        {
+
+        }
+
+        protected bool ResetAndStoreCanExecute(object? parameter)
+        {
+            if (MyApplicationBehavior.TrackerRunning)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        private void OnTimerElapse(object? sender, ElapsedEventArgs e)
+        {
+            MyApplicationBehavior.MoneyMadeThisSession = Math.Round((_stopwatch.Elapsed.TotalHours * MyApplicationBehavior.HourlyWage) + _money_made_this_session_holder, 2);
+            MyApplicationBehavior.TotalMoneyMade = Math.Round((_stopwatch.Elapsed.TotalHours * MyApplicationBehavior.HourlyWage) + _total_money_made_holder, 2);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -18,11 +18,19 @@ namespace hourlyWorkTracker.Views
     /// <summary>
     /// Interaction logic for TrackerView.xaml
     /// </summary>
-    public partial class TrackerView : UserControl
+    public partial class TrackerView : Window
     {
         public TrackerView()
         {
             InitializeComponent();
+        }
+
+        private void clickedWindow(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                this.DragMove();
+            }
         }
     }
 }

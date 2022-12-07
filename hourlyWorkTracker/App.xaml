@@ -5,14 +5,16 @@
              xmlns:view="clr-namespace:hourlyWorkTracker.Views"
              xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
              xmlns:converter="clr-namespace:hourlyWorkTracker.Converters"
-             StartupUri="MainWindow.xaml">
+             xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
+             StartupUri="Views/TrackerView.xaml">
     <Application.Resources>
         <converter:ColorToBrushConverter x:Key="CTBC"/>
-        <DataTemplate DataType="{x:Type vm:TrackerWindowViewModel}">
+        <converter:MoneyFormatter x:Key="MF"/>
+        <!--<DataTemplate DataType="{x:Type vm:TrackerWindowViewModel}">
             <view:TrackerView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ConfigureWindowViewModel}">
             <view:ConfigureView/>
-        </DataTemplate>
+        </DataTemplate>-->
     </Application.Resources>
 </Application>

@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Media;
 
 namespace hourlyWorkTracker.Converters
 {
-    public class ColorToBrushConverter : IValueConverter
+    public class MoneyFormatter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return new SolidColorBrush((Color)value);
+            double d = (double)value;
+            return $"${d:F2}";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            SolidColorBrush s = (SolidColorBrush)value;
-            return s.Color;
+            string s = (string)value;
+            _ = double.TryParse(s[1..], out double result);
+            return result;
         }
     }
 }

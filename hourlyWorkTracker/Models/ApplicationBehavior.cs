@@ -12,7 +12,8 @@ namespace hourlyWorkTracker.Models
     {
         public ApplicationBehavior(Color rectangle_fill, Color ticker_foreground, Color button_background,
             Color button_text_foreground, Color grid_background, double opacity, double hourly_wage, bool hourly_wage_changed,
-            double total_money_made, bool total_money_made_changed)
+            double total_money_made, bool total_money_made_changed, double money_made_this_session, bool tracker_running,
+            string start_stop_button_text)
         {
             _rectangle_fill = rectangle_fill;
             _ticker_foreground = ticker_foreground;
@@ -24,6 +25,9 @@ namespace hourlyWorkTracker.Models
             _hourly_wage_changed = hourly_wage_changed;
             _total_money_made = total_money_made;
             _total_money_made_changed = total_money_made_changed;
+            _money_made_this_session = money_made_this_session;
+            _tracker_running = tracker_running;
+            _start_stop_button_text = start_stop_button_text;
         }
 
         private Color _rectangle_fill;
@@ -37,6 +41,9 @@ namespace hourlyWorkTracker.Models
         private double _total_money_made;
         private bool _total_money_made_changed;
         private double _money_made_this_session;
+        private bool _tracker_running;
+        private string _start_stop_button_text;
+        
 
         public Color RectangleFill
         {
@@ -136,6 +143,36 @@ namespace hourlyWorkTracker.Models
             {
                 _total_money_made_changed = value;
                 OnPropertyChanged("TotalMoneyMadeChanged");
+            }
+        }
+
+        public double MoneyMadeThisSession
+        {
+            get { return _money_made_this_session; }
+            set
+            {
+                _money_made_this_session = value;
+                OnPropertyChanged("MoneyMadeThisSession");
+            }
+        }
+
+        public bool TrackerRunning
+        {
+            get { return _tracker_running; }
+            set
+            {
+                _tracker_running = value;
+                OnPropertyChanged("TrackerRunning");
+            }
+        }
+
+        public string StartStopButtonText
+        {
+            get { return _start_stop_button_text; }
+            set
+            {
+                _start_stop_button_text = value;
+                OnPropertyChanged("StartStopButtonText");
             }
         }
 

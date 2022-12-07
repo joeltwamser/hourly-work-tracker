@@ -18,7 +18,7 @@ namespace hourlyWorkTracker.Views
     /// <summary>
     /// Interaction logic for ConfigureView.xaml
     /// </summary>
-    public partial class ConfigureView : UserControl
+    public partial class ConfigureView : Window
     {
         public ConfigureView()
         {
