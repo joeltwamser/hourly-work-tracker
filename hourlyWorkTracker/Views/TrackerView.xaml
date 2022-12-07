@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:hourlyWorkTracker"
         xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
         xmlns:view="clr-namespace:hourlyWorkTracker.Views"
-        mc:Ignorable="d" Height="450" Width="800" AllowsTransparency="True" ResizeMode="CanResize"
+        mc:Ignorable="d" Height="{Binding Path=TrackerHeight, Mode=TwoWay}" Width="{Binding TrackerWidth, Mode=TwoWay}" AllowsTransparency="True" ResizeMode="CanResize"
         WindowStyle="None" Opacity="{Binding MyApplicationBehavior.Opacity}" x:Name="HWTTrackerWindow"
         MouseDown="clickedWindow">
     <Window.DataContext>
@@ -56,24 +56,38 @@
                 <RowDefinition Height="4*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <Viewbox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,44,0,0"
+            <Viewbox Margin="60" Grid.Row="0" Grid.Column="0">
+                <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
+            </Viewbox>
+            <Viewbox Margin="60" Grid.Row="0" Grid.Column="3">
+                <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
+            </Viewbox>
+            <Viewbox Margin="40" Grid.Row="2" Grid.Column="0">
+                <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
+            </Viewbox>
+            <Viewbox Margin="40" Grid.Row="2" Grid.Column="3">
+                <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
+            </Viewbox>
+            <Viewbox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,44,0,0"
                          HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Style="{StaticResource Ticker}" Text="{Binding MyApplicationBehavior.MoneyMadeThisSession, Converter={StaticResource MF}}"></TextBlock>
             </Viewbox>
-            <Viewbox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1,0,0"
+            <Viewbox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,1,0,0"
                          HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Style="{StaticResource Ticker}" Text="{Binding MyApplicationBehavior.TotalMoneyMade, Converter={StaticResource MF}}"></TextBlock>
             </Viewbox>
-            <Button Grid.Row="2" Grid.Column="0" Margin="172,25,10,48" Command="{Binding StartStopTracker}">
+            <Button Grid.Row="2" Grid.Column="1" Margin="30,25,10,48" Command="{Binding StartStopTracker}">
                 <Viewbox Margin="5,5,5,6">
                     <TextBlock Style="{StaticResource ButtonText}" Text="{Binding MyApplicationBehavior.StartStopButtonText}"></TextBlock>
                 </Viewbox>
             </Button>
-            <Button Grid.Row="2" Grid.Column="1" Margin="10,25,172,48" Command="{Binding ResetAndStore}">
-                <Viewbox Margin="3,6,3,3">
+            <Button Grid.Row="2" Grid.Column="2" Margin="10,25,30,48" Command="{Binding ResetAndStore}">
+                <Viewbox Margin="3,0,3,0">
                     <TextBlock Style="{StaticResource ButtonText}" TextAlignment="Center" LineStackingStrategy="BlockLineHeight"
                                    LineHeight="11">Reset+Store<LineBreak/>Session</TextBlock>
                 </Viewbox>

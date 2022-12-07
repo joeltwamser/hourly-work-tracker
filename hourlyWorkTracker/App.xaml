@@ -6,7 +6,8 @@
              xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
              xmlns:converter="clr-namespace:hourlyWorkTracker.Converters"
              xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
-             StartupUri="Views/TrackerView.xaml">
+             Startup="App_Startup"
+             Exit="App_Exit">
     <Application.Resources>
         <converter:ColorToBrushConverter x:Key="CTBC"/>
         <converter:MoneyFormatter x:Key="MF"/>

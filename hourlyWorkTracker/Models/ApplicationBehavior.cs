@@ -28,6 +28,7 @@ namespace hourlyWorkTracker.Models
             _money_made_this_session = money_made_this_session;
             _tracker_running = tracker_running;
             _start_stop_button_text = start_stop_button_text;
+
         }
 
         private Color _rectangle_fill;
@@ -43,7 +44,6 @@ namespace hourlyWorkTracker.Models
         private double _money_made_this_session;
         private bool _tracker_running;
         private string _start_stop_button_text;
-        
 
         public Color RectangleFill
         {
