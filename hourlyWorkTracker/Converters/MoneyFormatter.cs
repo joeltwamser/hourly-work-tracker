@@ -9,7 +9,8 @@ namespace hourlyWorkTracker.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double d = (double)value;
-            return $"${d:F2}";
+            //this only rounds to 2 decimal points.  need to add commas every 3 digits.
+            return $"{d:C2}";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

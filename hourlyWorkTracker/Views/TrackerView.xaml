@@ -7,9 +7,10 @@
         xmlns:local="clr-namespace:hourlyWorkTracker"
         xmlns:vm="clr-namespace:hourlyWorkTracker.ViewModels"
         xmlns:view="clr-namespace:hourlyWorkTracker.Views"
-        mc:Ignorable="d" Height="{Binding Path=TrackerHeight, Mode=TwoWay}" Width="{Binding TrackerWidth, Mode=TwoWay}" AllowsTransparency="True" ResizeMode="CanResize"
-        WindowStyle="None" Opacity="{Binding MyApplicationBehavior.Opacity}" x:Name="HWTTrackerWindow"
-        MouseDown="clickedWindow">
+        mc:Ignorable="d" Height="{Binding Path=TrackerHeight, Mode=TwoWay}" Width="{Binding TrackerWidth, Mode=TwoWay}"
+        AllowsTransparency="True" ResizeMode="CanResize" WindowStyle="None" Opacity="{Binding MyApplicationBehavior.Opacity}"
+        x:Name="HWTTrackerWindow" MouseDown="clickedWindow" Topmost="{Binding PopToFront}" Top="{Binding Path=Top, Mode=TwoWay}"
+        Left="{Binding Path=Left, Mode=TwoWay}">
     <Window.DataContext>
         <vm:ApplicationBehaviorViewModel/>
     </Window.DataContext>
@@ -34,6 +35,10 @@
         </Style>
         <Style TargetType="TextBlock" x:Key="ButtonText">
             <Setter Property="Foreground" Value="{Binding MyApplicationBehavior.ButtonTextForeground, Converter={StaticResource CTBC}}"/>
+        </Style>
+        <Style TargetType="Viewbox" x:Key="DollarSignVB">
+            <Setter Property="Height" Value="{Binding ElementName=TotalMoneyTicker, Path=ActualHeight}"/>
+            <Setter Property="Width" Value="{Binding ElementName=TotalMoneyTicker, Path=ActualWidth}"/>
         </Style>
     </Window.Resources>
     <Window.ContextMenu>
@@ -61,33 +66,33 @@
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <Viewbox Margin="60" Grid.Row="0" Grid.Column="0">
+            <Viewbox Style="{StaticResource DollarSignVB}" Grid.Row="0" Grid.Column="0">
                 <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
             </Viewbox>
-            <Viewbox Margin="60" Grid.Row="0" Grid.Column="3">
+            <Viewbox Style="{StaticResource DollarSignVB}" Grid.Row="0" Grid.Column="3">
                 <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
             </Viewbox>
-            <Viewbox Margin="40" Grid.Row="2" Grid.Column="0">
+            <Viewbox Style="{StaticResource DollarSignVB}" Grid.Row="2" Grid.Column="0">
                 <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
             </Viewbox>
-            <Viewbox Margin="40" Grid.Row="2" Grid.Column="3">
+            <Viewbox Style="{StaticResource DollarSignVB}" Grid.Row="2" Grid.Column="3">
                 <TextBlock Style="{StaticResource Ticker}">$</TextBlock>
             </Viewbox>
-            <Viewbox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,44,0,0"
+            <Viewbox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,13,0,0"
                          HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Style="{StaticResource Ticker}" Text="{Binding MyApplicationBehavior.MoneyMadeThisSession, Converter={StaticResource MF}}"></TextBlock>
             </Viewbox>
-            <Viewbox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,1,0,0"
+            <Viewbox Name="TotalMoneyTicker" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0"
                          HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Style="{StaticResource Ticker}" Text="{Binding MyApplicationBehavior.TotalMoneyMade, Converter={StaticResource MF}}"></TextBlock>
             </Viewbox>
-            <Button Grid.Row="2" Grid.Column="1" Margin="30,25,10,48" Command="{Binding StartStopTracker}">
-                <Viewbox Margin="5,5,5,6">
+            <Button Grid.Row="2" Grid.Column="1" Margin="14,5,5,13" Command="{Binding StartStopTracker}">
+                <Viewbox Margin="2">
                     <TextBlock Style="{StaticResource ButtonText}" Text="{Binding MyApplicationBehavior.StartStopButtonText}"></TextBlock>
                 </Viewbox>
             </Button>
-            <Button Grid.Row="2" Grid.Column="2" Margin="10,25,30,48" Command="{Binding ResetAndStore}">
-                <Viewbox Margin="3,0,3,0">
+            <Button Grid.Row="2" Grid.Column="2" Margin="5,5,14,13" Command="{Binding ResetAndStore}">
+                <Viewbox Margin="0">
                     <TextBlock Style="{StaticResource ButtonText}" TextAlignment="Center" LineStackingStrategy="BlockLineHeight"
                                    LineHeight="11">Reset+Store<LineBreak/>Session</TextBlock>
                 </Viewbox>

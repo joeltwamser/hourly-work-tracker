@@ -99,6 +99,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -115,10 +116,13 @@
                     <xctk:ColorPicker Grid.Row="3" Grid.Column="1" SelectedColor="{Binding Path=MyApplicationBehavior.GridBackground, Mode=TwoWay}"></xctk:ColorPicker>
                     <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="0">Button Text Color:</TextBlock>
                     <xctk:ColorPicker Grid.Row="5" Grid.Column="0" SelectedColor="{Binding Path=MyApplicationBehavior.ButtonTextForeground, Mode=TwoWay}"></xctk:ColorPicker>
-                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="1">Opacity:</TextBlock>
-                    <Slider Grid.Row="5" Grid.Column="1" Margin="6" Minimum="0.1" Maximum="1.0"
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="1">Pop To Front:</TextBlock>
+                    <CheckBox Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0"
+                              IsChecked="{Binding Path=PopToFront, Mode=TwoWay}"></CheckBox>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="6" Grid.Column="0">Opacity:</TextBlock>
+                    <Slider Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="6" Minimum="0.1" Maximum="1.0"
                             Value="{Binding Path=MyApplicationBehavior.Opacity, Mode=TwoWay}"></Slider>
-                    <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding RestoreDefaults}">
+                    <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding RestoreDefaults}">
                         <TextBlock Style="{StaticResource RestoreDefaults}">Restore Defaults</TextBlock>
                     </Button>
                 </Grid>

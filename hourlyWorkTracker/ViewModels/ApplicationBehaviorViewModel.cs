@@ -9,6 +9,7 @@ using hourlyWorkTracker.Views;
 using System.Windows;
 using System.Windows.Threading;
 using System.Diagnostics;
+using System.IO;
 
 namespace hourlyWorkTracker.ViewModels
 {
@@ -33,14 +34,20 @@ namespace hourlyWorkTracker.ViewModels
             _total_money_made_changed_timer = new DispatcherTimer(DispatcherPriority.Render);
             _total_money_made_changed_timer.Tick += OnSaveTimerElapse;
             _total_money_made_changed_timer.Interval = TimeSpan.FromSeconds(3);
+            _session_duration_stopwatch = new Stopwatch();
 
             _tracker_height = 450;
             _tracker_width = 800;
+            _session_duration = new TimeSpan(0);
+            _is_cfw_open = false;
         }
 
+        //This constructor exists to make the apps state persist across instances.  Maybe there is a better
+        //way to do this.
         public ApplicationBehaviorViewModel(Color rectangle_fill, Color ticker_foreground, Color button_background,
             Color button_text_foreground, Color grid_background, double opacity, double hourly_wage,
-            double total_money_made, double money_made_this_session)
+            double total_money_made, double money_made_this_session, double tracker_width, double tracker_height, 
+            bool pop_to_front, double top, double left, TimeSpan session_duration, DateTime session_start_time)
         {
             _my_application_behavior = new ApplicationBehavior(rectangle_fill, ticker_foreground, button_background,
                 button_text_foreground, grid_background, opacity, hourly_wage, false, total_money_made, false,
@@ -59,12 +66,19 @@ namespace hourlyWorkTracker.ViewModels
             _total_money_made_changed_timer = new DispatcherTimer(DispatcherPriority.Render);
             _total_money_made_changed_timer.Tick += OnSaveTimerElapse;
             _total_money_made_changed_timer.Interval = TimeSpan.FromSeconds(3);
+            _session_duration_stopwatch = new Stopwatch();
 
-            _tracker_height = 450;
-            _tracker_width = 800;
+            _tracker_height = tracker_height;
+            _tracker_width = tracker_width;
+            _pop_to_front = pop_to_front;
+            _top = top;
+            _left = left;
+            _session_duration = session_duration;
+            _session_start_time = session_start_time;
+            _is_cfw_open = false;
         }
 
-        //Fields
+        //Fields w/ properties
         protected ApplicationBehavior _my_application_behavior;
         protected ICommand? _open_configure_window;
         protected ICommand? _close_window;
@@ -75,15 +89,24 @@ namespace hourlyWorkTracker.ViewModels
         protected ICommand? _restore_defaults;
         private double _tracker_height;
         private double _tracker_width;
+        private bool _pop_to_front;
+        private double _top;
+        private double _left;
+        private TimeSpan _session_duration;
+        private DateTime? _session_start_time;
 
+        //Fields w/o properties
         protected double _money_made_this_session_holder;
         protected double _total_money_made_holder;
+        private const string _session_log_filename = "Session logs.csv";
+        private bool _is_cfw_open;
 
         //This timer info should probably be extracted to a class
         protected DispatcherTimer _start_stop_timer;
         protected Stopwatch _stopwatch;
         protected DispatcherTimer _hourly_wage_changed_timer;
         protected DispatcherTimer _total_money_made_changed_timer;
+        protected Stopwatch _session_duration_stopwatch;
 
         public ApplicationBehavior MyApplicationBehavior
         {
@@ -91,7 +114,7 @@ namespace hourlyWorkTracker.ViewModels
             set
             {
                 _my_application_behavior = value;
-                NotifyPropertyChanged("MyApplicationBehavior");
+                NotifyPropertyChanged(nameof(MyApplicationBehavior));
             }
         }
 
@@ -101,7 +124,7 @@ namespace hourlyWorkTracker.ViewModels
             set
             {
                 _tracker_height = value;
-                NotifyPropertyChanged("TrackerHeight");
+                NotifyPropertyChanged(nameof(TrackerHeight));
             }
         }
 
@@ -111,8 +134,50 @@ namespace hourlyWorkTracker.ViewModels
             set
             {
                 _tracker_width = value;
-                NotifyPropertyChanged("TrackerWidth");
+                NotifyPropertyChanged(nameof(TrackerWidth));
             }
+        }
+
+        public bool PopToFront
+        {
+            get { return _pop_to_front; }
+            set
+            {
+                _pop_to_front = value;
+                NotifyPropertyChanged(nameof(PopToFront));
+            }
+        }
+
+        public double Top
+        {
+            get { return _top; }
+            set
+            {
+                _top = value;
+                NotifyPropertyChanged(nameof(Top));
+            }
+        }
+
+        public double Left
+        {
+            get { return _left; }
+            set
+            {
+                _left = value;
+                NotifyPropertyChanged(nameof(Left));
+            }
+        }
+
+        public TimeSpan SessionDuration
+        {
+            get { return _session_duration; }
+            set { _session_duration = value; }
+        }
+
+        public DateTime? SessionStartTime
+        {
+            get { return _session_start_time; }
+            set { _session_start_time = value; }
         }
 
         public TimeSpan AnimationDuration
@@ -136,7 +201,7 @@ namespace hourlyWorkTracker.ViewModels
             {
                 if (_open_configure_window == null)
                 {
-                    _open_configure_window = new Command(OpenConfigureWindowExecute, GenericReturnTrue);
+                    _open_configure_window = new Command(OpenConfigureWindowExecute, OpenConfigureWindowCanExecute);
                 }
                 return _open_configure_window;
             }
@@ -148,7 +213,14 @@ namespace hourlyWorkTracker.ViewModels
             {
                 DataContext = this
             };
+            _is_cfw_open = true;
+            w.Closed += OnWindowClosed;
             w.Show();
+        }
+
+        protected bool OpenConfigureWindowCanExecute(object? parameter)
+        {
+            return !_is_cfw_open;
         }
 
         public ICommand CloseWindow
@@ -167,6 +239,7 @@ namespace hourlyWorkTracker.ViewModels
         {
             if (parameter is TrackerView)
             {
+                SessionDuration += _session_duration_stopwatch.Elapsed;
                 Application.Current.Shutdown();
             }
             else if (parameter is Window w)
@@ -181,7 +254,7 @@ namespace hourlyWorkTracker.ViewModels
             {
                 if(_save_hourly_wage == null)
                 {
-                    _save_hourly_wage = new Command(SaveHourlyWageExecute, TextBoxCanExecute);
+                    _save_hourly_wage = new Command(SaveHourlyWageExecute, SaveHourlyWageCanExecute);
                 }
                 return _save_hourly_wage;
             }
@@ -199,6 +272,11 @@ namespace hourlyWorkTracker.ViewModels
                     _hourly_wage_changed_timer.Start();
                 }
             }
+        }
+
+        protected bool SaveHourlyWageCanExecute(object? parameter)
+        {
+            return TextBoxCanExecute(parameter) && (MyApplicationBehavior.MoneyMadeThisSession <= 0);
         }
 
         public ICommand SaveTotalMoneyMade
@@ -248,12 +326,17 @@ namespace hourlyWorkTracker.ViewModels
         {
             if (!MyApplicationBehavior.TrackerRunning)
             {
+                if (MyApplicationBehavior.MoneyMadeThisSession <= 0)
+                {
+                    _session_start_time = DateTime.Now;
+                }
                 MyApplicationBehavior.TrackerRunning = true;
                 MyApplicationBehavior.StartStopButtonText = "Stop";
                 _money_made_this_session_holder = MyApplicationBehavior.MoneyMadeThisSession;
                 _total_money_made_holder = MyApplicationBehavior.TotalMoneyMade;
                 _start_stop_timer.Start();
                 _stopwatch.Start();
+                _session_duration_stopwatch.Start();
             }
             else
             {
@@ -262,6 +345,7 @@ namespace hourlyWorkTracker.ViewModels
                 _start_stop_timer.Stop();
                 _stopwatch.Stop();
                 _stopwatch.Reset();
+                _session_duration_stopwatch.Stop();
             }
         }
 
@@ -281,8 +365,24 @@ namespace hourlyWorkTracker.ViewModels
         //and _money_made_this_session_holder
         protected void ResetAndStoreExecute(object? parameter)
         {
+            MyApplicationBehavior.TotalMoneyMade = Math.Round(MyApplicationBehavior.TotalMoneyMade, 2);
+            bool exists = File.Exists(_session_log_filename);
+            using (FileStream fs = new(_session_log_filename, FileMode.Append, FileAccess.Write))
+            using (StreamWriter sw = new(fs))
+            {
+                if (!exists)
+                {
+                    sw.WriteLine("Session Start Date,Session Duration (# of hours),Hourly Wage,Wages Earned");
+                }
+                sw.Write(_session_start_time + ",");
+                sw.Write((_session_duration_stopwatch.Elapsed + SessionDuration).TotalHours.ToString("F2") + ",");
+                sw.Write("$" + MyApplicationBehavior.HourlyWage.ToString("F2") + "/hr,");
+                sw.WriteLine("$" + MyApplicationBehavior.MoneyMadeThisSession.ToString("F2"));
+            }
             MyApplicationBehavior.MoneyMadeThisSession = 0;
             _money_made_this_session_holder = 0;
+            SessionDuration = new TimeSpan(0);
+            _session_duration_stopwatch.Reset();
         }
 
         protected bool ResetAndStoreCanExecute(object? parameter)
@@ -318,8 +418,11 @@ namespace hourlyWorkTracker.ViewModels
             MyApplicationBehavior.ButtonTextForeground = Colors.Black;
             MyApplicationBehavior.GridBackground = Colors.Black;
             MyApplicationBehavior.Opacity = 1.0;
+            PopToFront = false;
             TrackerHeight = 450;
             TrackerWidth = 800;
+            Top = 0;
+            Left = 0;
         }
 
         private void OnTimerElapse(object? sender, EventArgs e)
@@ -340,6 +443,11 @@ namespace hourlyWorkTracker.ViewModels
                 MyApplicationBehavior.TotalMoneyMadeChanged = false;
             }
             t.Stop();
+        }
+
+        private void OnWindowClosed(object? sender, EventArgs e)
+        {
+            _is_cfw_open = false;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
