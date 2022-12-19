@@ -64,6 +64,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -74,20 +75,26 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Style="{StaticResource SubHeading}" Grid.Row="0" Grid.Column="0">Update Hourly Wage:</TextBlock>
                     <TextBlock Style="{StaticResource TinyHeading}" Grid.Row="1" Grid.Column="0">(Format ex: ##.##)</TextBlock>
-                    <TextBox Name="HourlyWageTextBox" Grid.Row="2" Grid.Column="0"></TextBox>
-                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="3" Grid.Column="0">Update Total Money Made:</TextBlock>
-                    <TextBlock Style="{StaticResource TinyHeading}" Grid.Row="4" Grid.Column="0">(Format ex: #########.##)</TextBlock>
-                    <TextBox Name="TotalMoneyTextBox" Grid.Row="5" Grid.Column="0"></TextBox>
-                    <Button Grid.Row="2" Grid.Column="1" Command="{Binding SaveHourlyWage}" CommandParameter="{Binding ElementName=HourlyWageTextBox}">
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0">
+                        <TextBlock Style="{StaticResource TinyHeading}" Foreground="Green"
+                               FontWeight="Bold">Currently:</TextBlock>
+                        <TextBlock Style="{StaticResource TinyHeading}" Text="{Binding Path=MyApplicationBehavior.HourlyWage, Converter={StaticResource MF}}"
+                                   Foreground="Green" FontWeight="Bold"></TextBlock>
+                    </StackPanel>
+                    <TextBox Name="HourlyWageTextBox" Grid.Row="3" Grid.Column="0"></TextBox>
+                    <TextBlock Style="{StaticResource SubHeading}" Grid.Row="4" Grid.Column="0">Update Total Money Made:</TextBlock>
+                    <TextBlock Style="{StaticResource TinyHeading}" Grid.Row="5" Grid.Column="0">(Format ex: #########.##)</TextBlock>
+                    <TextBox Name="TotalMoneyTextBox" Grid.Row="6" Grid.Column="0"></TextBox>
+                    <Button Grid.Row="3" Grid.Column="1" Command="{Binding SaveHourlyWage}" CommandParameter="{Binding ElementName=HourlyWageTextBox}">
                         <TextBlock Style="{StaticResource SaveButtonText}" Text="Save"/>
                     </Button>
                     <TextBlock Visibility="{Binding MyApplicationBehavior.HourlyWageChanged, Converter={StaticResource BoolToVisibilityConverter}}"
-                               Style="{StaticResource Saved}" Grid.Row="2" Grid.Column="2">SAVED!!!</TextBlock>
-                    <Button Grid.Row="5" Grid.Column="1" Command="{Binding SaveTotalMoneyMade}" CommandParameter="{Binding ElementName=TotalMoneyTextBox}">
+                               Style="{StaticResource Saved}" Grid.Row="3" Grid.Column="2">SAVED!!!</TextBlock>
+                    <Button Grid.Row="6" Grid.Column="1" Command="{Binding SaveTotalMoneyMade}" CommandParameter="{Binding ElementName=TotalMoneyTextBox}">
                         <TextBlock Style="{StaticResource SaveButtonText}" Text="Save"/>
                     </Button>
                     <TextBlock Visibility="{Binding MyApplicationBehavior.TotalMoneyMadeChanged, Converter={StaticResource BoolToVisibilityConverter}}"
-                               Style="{StaticResource Saved}" Grid.Row="5" Grid.Column="2">SAVED!!!</TextBlock>
+                               Style="{StaticResource Saved}" Grid.Row="6" Grid.Column="2">SAVED!!!</TextBlock>
                 </Grid>
             </TabItem>
             <TabItem Header="Customize UI">

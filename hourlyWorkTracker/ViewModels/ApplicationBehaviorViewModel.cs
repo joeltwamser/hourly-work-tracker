@@ -40,6 +40,7 @@ namespace hourlyWorkTracker.ViewModels
             _tracker_width = 800;
             _session_duration = new TimeSpan(0);
             _is_cfw_open = false;
+            _session_start_time = DateTime.Now;
         }
 
         //This constructor exists to make the apps state persist across instances.  Maybe there is a better
@@ -93,7 +94,7 @@ namespace hourlyWorkTracker.ViewModels
         private double _top;
         private double _left;
         private TimeSpan _session_duration;
-        private DateTime? _session_start_time;
+        private DateTime _session_start_time;
 
         //Fields w/o properties
         protected double _money_made_this_session_holder;
@@ -174,7 +175,7 @@ namespace hourlyWorkTracker.ViewModels
             set { _session_duration = value; }
         }
 
-        public DateTime? SessionStartTime
+        public DateTime SessionStartTime
         {
             get { return _session_start_time; }
             set { _session_start_time = value; }
